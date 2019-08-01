@@ -1,6 +1,6 @@
-// title:  game title
-// author: game developer
-// desc:   short description
+// title:  Ticket Crusher
+// author: Christopher Stokes
+// desc:   Completely accurate simulation of Technical Support
 // script: js
 
 var t=0 //ongoing frame counter
