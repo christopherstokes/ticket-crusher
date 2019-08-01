@@ -48,7 +48,7 @@ p.update = function() {
 		this.actionCountdown = 10;
 		
 		for (var t=0; t<tickets.length; t++) {
-			if (collides(this, tickets[t]) && tickets[t].alive) {
+			if (collides({'x': this.x, 'y': this.y, 'wid': this.wid/2, 'hei': this.hei/2}, tickets[t]) && tickets[t].alive) {
 				for (var i=0; i<5; i++) {
 					var e = new Explosion(tickets[t].x+(tickets[t].wid/2), tickets[t].y+(tickets[t].hei/2));
 					explosions.push(e);
