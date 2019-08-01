@@ -48,11 +48,20 @@ p.update = function() {
 		this.actionCountdown = 10;
 		
 		for (var t=0; t<tickets.length; t++) {
+
 			if (collides({'x': this.x, 'y': this.y, 'wid': this.wid/2, 'hei': this.hei/2}, tickets[t]) && tickets[t].alive) {
 				for (var i=0; i<5; i++) {
 					var e = new Explosion(tickets[t].x+(tickets[t].wid/2), tickets[t].y+(tickets[t].hei/2));
 					explosions.push(e);
 				}
+				// if (getRandomInt(0, 10) > 7) {
+				// 	var t1 = new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x-tickets[t].wid, tickets[t].y-tickets[t].hei, -1, -1);
+				// 	var t2 = new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x+tickets[t].wid, tickets[t].y+tickets[t].hei, 1, 1);
+				// 	var t3 = new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x-tickets[t].wid, tickets[t].y+tickets[t].hei, -1, 1);
+				// 	var t4 = new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x+tickets[t].wid, tickets[t].y-tickets[t].hei, 1, -1);
+				// 	tickets.push(t1, t2, t3, t4);
+				// }
+
 				tickets[t].alive = false;
 				gameState.score += 1;
 				shake = 5;
@@ -78,7 +87,7 @@ p.draw = function() {
 // tickets
 var tickets = []
 
-var Ticket = function(speed, bounce, x, y) {
+var Ticket = function(speed, bounce, x, y, dx, dy) {
 	this.x = x || getRandomInt(16,swid-16);
 	this.y = y || getRandomInt(16,shei-24);
 	this.sprite = 5;
@@ -89,18 +98,30 @@ var Ticket = function(speed, bounce, x, y) {
 	this.bounce = bounce;
 	this.rebound = 0;
 
-	
-	if (this.x <= swid/2)
-		this.dx = this.speed;
+	if (dx) {
+		this.dx = this.speed*dx;
+	} else {
+		if (this.x <= swid/2)
+			this.dx = this.speed;
 		
-	if (this.x > swid/2)
-		this.dx = (-1 * this.speed);
-	
-	if (this.y <= shei/2)
-		this.dy = this.speed;
+		if (this.x > swid/2)
+			this.dx = (-1 * this.speed);
+	}
+
+	if (dy) {
+		this.dy = this.speed*dy;
+	} else {
+		if (this.y <= shei/2)
+			this.dy = this.speed;
 		
-	if (this.y > shei/2)
-		this.dy = (-1 * this.speed);
+		if (this.y > shei/2)
+			this.dy = (-1 * this.speed);
+	}
+
+	
+	
+	
+	
 	
 }
 
