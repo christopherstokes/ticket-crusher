@@ -56,6 +56,7 @@ p.update = function() {
 				tickets[t].alive = false;
 				gameState.score += 1;
 				shake = 5;
+				sfx(0);
 			}
 		}
 	} 
@@ -182,12 +183,15 @@ menuState.update = function() {
 var gameState = {};
 gameState.score = 0;
 gameState.missed = 0;
+gameState.day = 1;
 gameState.globalSpeed;
 gameState.globalBounce;
 gameState.numTickets;
 gameState.preload = function() {
 	gameState.score = 0;
 	gameState.missed = 0;
+	tickets = [];
+	explosions = [];
 	gameState.newWave(5, 0.5, 3);
 }
 gameState.newWave = function(num, speed, bounce) {
@@ -212,10 +216,6 @@ gameState.update = function() {
 		}
 	}
 
-	if (tickets.length == 0) {
-		gameState.newWave(gameState.numTickets + 1, gameState.globalSpeed + 0.025, gameState.globalBounce - 0.025)
-	}
-
 	for (e=explosions.length-1; e>-1; e--) {
 		if (!explosions[e].alive) {
 			explosions.splice(e, 1);
@@ -231,7 +231,7 @@ gameState.update = function() {
 	print("Tickets Closed: "+this.score, 5, 5);
 	print("Tickets Missed: "+this.missed, 5, 15);
 
-	if (this.missed > this.score) {
+	if (this.missed > this.score/2) {
 		currentState = gameoverState;
 	}
 
@@ -239,6 +239,12 @@ gameState.update = function() {
 		poke(0x3FF9+1,getRandomInt(-4, 4))
 		shake-=1		
 		if (shake==0) memset(0x3FF9,0,2);
+	}
+
+	if (tickets.length == 0) {
+		gameState.day += 1;
+		gameState.newWave(gameState.numTickets + 1, gameState.globalSpeed + 0.025, gameState.globalBounce - 0.025)
+
 	}
 }
 
@@ -290,7 +296,7 @@ function scanline()
 // </WAVES>
 
 // <SFX>
-// 000:000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000304000000000
+// 000:030803080308030803080308230053019302a301b301c300e300e300f300f300f300f300f300f300f300f300f300f300f300f300f300f300f300f300300000000000
 // </SFX>
 
 // <PALETTE>
