@@ -1,4 +1,4 @@
-// title:  Ticket Crusher
+	// title:  Ticket Crusher
 // author: Christopher Stokes
 // desc:   Completely accurate simulation of Technical Support
 // script: js
@@ -78,9 +78,9 @@ p.draw = function() {
 // tickets
 var tickets = []
 
-var Ticket = function(speed, bounce) {
-	this.x = getRandomInt(16,swid-16);
-	this.y = getRandomInt(16,shei-16);
+var Ticket = function(speed, bounce, x, y) {
+	this.x = x || getRandomInt(16,swid-16);
+	this.y = y || getRandomInt(16,shei-24);
 	this.sprite = 5;
 	this.wid = 16;
 	this.hei = 16;
@@ -113,12 +113,12 @@ Ticket.prototype.update = function() {
 		this.bounce -=1;
 	}
 	
-	if ((this.y < 16 || this.y > shei-this.hei) && this.bounce > 0) {
+	if ((this.y < 16 || this.y > (shei-24)) && this.bounce >= 0) {
 		this.dy = this.dy * -1;
 		this.bounce -=1;
 	}
 	
-	if (this.x < -1 || this.x > swid+1 || this.y < 15 || this.y > swid+1) {
+	if (this.x < -1 || this.x > swid+1 || this.y < 15 || this.y > shei-8) {
 		this.alive = false;
 		gameState.missed += 1;
 	}
@@ -137,6 +137,9 @@ Ticket.prototype.update = function() {
 }
 
 Ticket.prototype.draw = function() {
+	if (this.bounce < 1) {
+		rect(this.x-2, this.y-2, this.wid+4, this.hei+4, 6);
+	}
 	spr(this.sprite, this.x, this.y, -1, 1, 0, 0, 2, 2);
 }
 
@@ -238,11 +241,11 @@ gameState.update = function() {
 	var TCtext = "CLOSED: "+this.score;
 	var TMtext = "MISSED: "+this.missed;
 
-	
-	print(TCtext, 5, shei-6);
-	var texWid = print(TMtext, 0, -32);
 
-	print(TMtext, (swid-(texWid+5)), shei-6);
+	rect(0, shei-8, 240, 8, 0)
+	print(TCtext, 5, shei-7);
+	var texWid = print(TMtext, 0, -32);
+	print(TMtext, (swid-(texWid+5)), shei-7);
 
 	if (this.missed > this.score/2) {
 		currentState = gameoverState;
