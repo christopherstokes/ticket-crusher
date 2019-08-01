@@ -76,9 +76,9 @@ var p = {
 
 p.update = function() {
 	if(btn(0) && this.y>0)this.y--
-	if(btn(1))this.y++
-	if(btn(2))this.x--
-	if(btn(3))this.x++
+	if(btn(1) && this.y<shei-this.hei)this.y++
+	if(btn(2) && this.x>0)this.x--
+	if(btn(3) && this.x<swid-this.wid)this.x++
 	if(btnp(4)) {
 		this.actionCountdown = 10;
 		
