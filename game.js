@@ -118,7 +118,7 @@ Ticket.prototype.update = function() {
 		this.bounce -=1;
 	}
 	
-	if (this.x < -5 || this.x > swid+5 || this.y < -5 || this.y > swid+5) {
+	if (this.x < -1 || this.x > swid+1 || this.y < -1 || this.y > swid+1) {
 		this.alive = false;
 		gameState.missed += 1;
 	}
@@ -171,8 +171,12 @@ Explosion.prototype.draw = function() {
 var menuState = {} 
 menuState.update = function() {
 	cls(0);
-	print("TICKET CRUSHER", 15, 5);
-	print("PRESS X TO START", 15, 15);
+	var title = "TICKET CRUSHER";
+	var subtitle = "PRESS X TO START";
+	var texWid = print(title,0,-32);
+	print(title, (swid-texWid)/2, (shei-12)/2);
+	texWid = print(subtitle, 0, -32);
+	print(subtitle, (swid-texWid)/2, (shei+12)/2);
 	
 	if (btn(5)){
 		gameState.preload();
