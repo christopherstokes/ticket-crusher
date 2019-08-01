@@ -3,8 +3,9 @@
 // desc:   Completely accurate simulation of Technical Support
 // script: js
 
-var t=0 //ongoing frame counter
+var fc=0 //ongoing frame counter
 var shake=0 //screen shake
+var shaked=0 //shake distance
 
 var swid = 240;
 var shei = 136;
@@ -99,6 +100,7 @@ p.update = function() {
 
 				tickets[t].alive = false;
 				gameState.score += 1;
+				shaked = 4;
 				shake = 5;
 				sfx(0, getRandomInt(45,50));
 			}
@@ -167,11 +169,17 @@ Ticket.prototype.update = function() {
 	if ((this.x < 0 || this.x > swid-this.wid) && this.bounce > 0) {
 		this.dx = this.dx * -1;
 		this.bounce -=1;
+		shaked = 2;
+		shake = 2;
+		sfx(1, getRandomInt(45,50));
 	}
 	
 	if ((this.y < 16 || this.y > (shei-24)) && this.bounce >= 0) {
 		this.dy = this.dy * -1;
 		this.bounce -=1;
+		shaked = 2;
+		shake = 2;
+		sfx(1, getRandomInt(36,48));
 	}
 	
 	if (this.x < -1 || this.x > swid+1 || this.y < 15 || this.y > shei-8) {
@@ -193,9 +201,9 @@ Ticket.prototype.update = function() {
 }
 
 Ticket.prototype.draw = function() {
-	if (this.bounce < 1 && t%60 < 30) {
+	if (this.bounce < 1 && fc%30 < 15) {
 		rect(this.x-2, this.y-2, this.wid+4, this.hei+4, 6);
-	}
+	} 
 	spr(this.sprite, this.x, this.y, -1, 1, 0, 0, 2, 2);
 }
 
@@ -273,7 +281,7 @@ gameState.update = function() {
 	map(0, 0, 30, 17, 0, -8, 0);
 	print("https://goodertrack.com", 4, 10, 0)
 	
-	for (t=tickets.length-1; t>-1; t--) {
+	for (var t=tickets.length-1; t>-1; t--) {
 		if (!tickets[t].alive) {
 			tickets.splice(t, 1);
 		} else {
@@ -337,13 +345,13 @@ var currentState = menuState;
 
 function TIC()
 {
-	currentState.update();	
-	t++
+	currentState.update();
+	fc++;
 }
 
 function scanline() 
 {
-	if (shake > 0) poke(0x3FF9,getRandomInt(-4,4))
+	if (shake > 0) poke(0x3FF9,getRandomInt(-(shaked),shaked))
 }
 
 // <TILES>
@@ -481,7 +489,8 @@ function scanline()
 // </WAVES>
 
 // <SFX>
-// 000:030803080308030803080308230053019302a301b301c300e300e300f300f300f300f300f300f300f300f300f300f300f300f300f300f300f300f300300000000000
+// 000:030803080308030803080308230053019302a301b301c300e300e300f300f300f300f300f300f300f300f300f300f300f300f300f300f300f300f300307000000000
+// 001:000100020002400f500d900fa000b000d001e001f001f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000310000000000
 // </SFX>
 
 // <PALETTE>
