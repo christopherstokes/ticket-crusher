@@ -1,4 +1,4 @@
-	// title:  Ticket Crusher
+// title:  Ticket Crusher
 // author: Christopher Stokes
 // desc:   Completely accurate simulation of Technical Support
 // script: js
@@ -137,7 +137,7 @@ Ticket.prototype.update = function() {
 }
 
 Ticket.prototype.draw = function() {
-	if (this.bounce < 1) {
+	if (this.bounce < 1 && t%60 < 30) {
 		rect(this.x-2, this.y-2, this.wid+4, this.hei+4, 6);
 	}
 	spr(this.sprite, this.x, this.y, -1, 1, 0, 0, 2, 2);
