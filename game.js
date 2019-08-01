@@ -4,6 +4,8 @@
 // script: js
 
 var t=0 //ongoing frame counter
+var shake=0 //screen shake
+
 var swid = 240;
 var shei = 136;
 
@@ -18,10 +20,9 @@ function collides(objA, objB) {
 }
 
 function getRandomInt(min, max) {
-	var randInt = Math.floor(Math.random() * Math.floor(max));
-	if (randInt < min && min > 0) randInt += min;
-	if (min < 0) randInt -= min;
-	return randInt;
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
 
 // Player
@@ -44,12 +45,17 @@ p.update = function() {
 	if(btn(2))this.x--
 	if(btn(3))this.x++
 	if(btnp(4)) {
-		this.actionCountdown = 5;
+		this.actionCountdown = 10;
 		
 		for (var t=0; t<tickets.length; t++) {
 			if (collides(this, tickets[t]) && tickets[t].alive) {
+				for (var i=0; i<5; i++) {
+					var e = new Explosion(tickets[t].x+(tickets[t].wid/2), tickets[t].y+(tickets[t].hei/2));
+					explosions.push(e);
+				}
 				tickets[t].alive = false;
 				gameState.score += 1;
+				shake = 5;
 			}
 		}
 	} 
@@ -133,6 +139,34 @@ Ticket.prototype.draw = function() {
 	spr(this.sprite, this.x, this.y, -1, 1, 0, 0, 2, 2);
 }
 
+var explosions = [];
+
+var Explosion = function(x, y, rad, time) {
+	this.x = x;
+	this.y = y;
+	this.dx = getRandomInt(0, 2) - 1;
+	this.dy = getRandomInt(0, 2) - 1;
+	this.rad = rad || 3;
+	this.time = time || 15;
+	this.alive = true;
+}
+
+Explosion.prototype.update = function() {
+	this.rad -= 0.25;
+	this.time -= 1;
+	this.x += this.dx;
+	this.y += this.dy;
+
+	if (this.rad < 0 || this.time < 0) {
+		this.alive = false;
+	}
+}
+
+Explosion.prototype.draw = function() {
+	circ(this.x, this.y, this.rad+1, 0);
+	circ(this.x, this.y, this.rad, 6);
+}
+
 var menuState = {} 
 menuState.update = function() {
 	cls(0);
@@ -181,6 +215,15 @@ gameState.update = function() {
 	if (tickets.length == 0) {
 		gameState.newWave(gameState.numTickets + 1, gameState.globalSpeed + 0.025, gameState.globalBounce - 0.025)
 	}
+
+	for (e=explosions.length-1; e>-1; e--) {
+		if (!explosions[e].alive) {
+			explosions.splice(e, 1);
+		} else {
+			explosions[e].update();
+			explosions[e].draw();
+		}
+	}
 	
 	p.update();
 	p.draw();
@@ -190,6 +233,12 @@ gameState.update = function() {
 
 	if (this.missed > this.score) {
 		currentState = gameoverState;
+	}
+
+	if (shake > 0) {
+		poke(0x3FF9+1,getRandomInt(-4, 4))
+		shake-=1		
+		if (shake==0) memset(0x3FF9,0,2);
 	}
 }
 
@@ -212,6 +261,11 @@ function TIC()
 {
 	currentState.update();	
 	t++
+}
+
+function scanline() 
+{
+	if (shake > 0) poke(0x3FF9,getRandomInt(-4,4))
 }
 
 // <SPRITES>
