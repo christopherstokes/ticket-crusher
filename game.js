@@ -90,13 +90,6 @@ p.update = function() {
 					var e = new Explosion(tickets[t].x+(tickets[t].wid/2), tickets[t].y+(tickets[t].hei/2));
 					explosions.push(e);
 				}
-				// if (getRandomInt(0, 10) > 7) {
-				// 	var t1 = new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x-tickets[t].wid, tickets[t].y-tickets[t].hei, -1, -1);
-				// 	var t2 = new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x+tickets[t].wid, tickets[t].y+tickets[t].hei, 1, 1);
-				// 	var t3 = new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x-tickets[t].wid, tickets[t].y+tickets[t].hei, -1, 1);
-				// 	var t4 = new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x+tickets[t].wid, tickets[t].y-tickets[t].hei, 1, -1);
-				// 	tickets.push(t1, t2, t3, t4);
-				// }
 
 				tickets[t].alive = false;
 				gameState.score += 1;
@@ -166,7 +159,7 @@ Ticket.prototype.update = function() {
 	this.x += this.dx;
 	this.y += this.dy;
 	
-	if ((this.x < 0 || this.x > swid-this.wid) && this.bounce > 0) {
+	if ((this.x < 0 || this.x > swid-this.wid) && this.bounce >= 0) {
 		this.dx = this.dx * -1;
 		this.bounce -=1;
 		shaked = 2;
@@ -182,7 +175,7 @@ Ticket.prototype.update = function() {
 		sfx(1, getRandomInt(36,48));
 	}
 	
-	if (this.x < -1 || this.x > swid+1 || this.y < 15 || this.y > shei-8) {
+	if ((this.x < -1 || this.x > swid+1 || this.y < 15 || this.y > shei-8) && this.bounce < 0) {
 		this.alive = false;
 		gameState.missed += 1;
 	}
@@ -209,11 +202,11 @@ Ticket.prototype.draw = function() {
 
 var explosions = [];
 
-var Explosion = function(x, y, rad, time) {
+var Explosion = function(x, y, rad, time, dx, dy) {
 	this.x = x;
 	this.y = y;
-	this.dx = getRandomInt(0, 2) - 1;
-	this.dy = getRandomInt(0, 2) - 1;
+	this.dx = dx || getRandomInt(0, 2) - 1;
+	this.dy = dy || getRandomInt(0, 2) - 1;
 	this.rad = rad || 3;
 	this.time = time || 15;
 	this.alive = true;
@@ -283,6 +276,23 @@ gameState.update = function() {
 	
 	for (var t=tickets.length-1; t>-1; t--) {
 		if (!tickets[t].alive) {
+			if (getRandomInt(0, 10) > 8) {
+				var subTickets =  [
+					new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x-tickets[t].wid, tickets[t].y-tickets[t].hei, -(gameState.globalSpeed), -1)
+					,new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x+tickets[t].wid, tickets[t].y+tickets[t].hei, gameState.globalSpeed, gameState.globalSpeed)
+					,new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x-tickets[t].wid, tickets[t].y+tickets[t].hei, -(gameState.globalSpeed), gameState.globalSpeed)
+					,new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x+tickets[t].wid, tickets[t].y-tickets[t].hei, gameState.globalSpeed, -(gameState.globalSpeed))
+				]
+				subTickets.forEach(function(t) {
+					tickets.push(t);
+					for (var e=0; e<5; e++) {
+						explosions.push(
+							new Explosion(t.x+t.wid/2, t.y+t.hei/2, 
+								getRandomInt(2,5), getRandomInt(15, 45), 
+								-(t.dx * 0.75), -(t.dy * 0.75)));
+					}
+				});
+			}
 			tickets.splice(t, 1);
 		} else {
 			tickets[t].update();
