@@ -325,9 +325,10 @@ gameState.dayState.update = function() {
 		var ticketClosed = "-- DAY " + gameState.day + " --";
 		var texWid = print(ticketClosed, 0, -32);
 
-		var chg = 1/(gameState.dayFrame-fc);
+		var chgWid = (fc-gameState.dayFrame)/240;
+		var curWid = (fc-gameState.dayFrame) * EasingFunctions.easeInOutCubic(chgWid)
 
-		rect((swid-(fc-gameState.dayFrame))/2,((shei-6)/2)-2, fc-(gameState.dayFrame * EasingFunctions.easeInQuad(chg)), 10, (gameState.day % 5)+5)
+		rect((swid-curWid)/2,((shei-6)/2)-2, curWid, 10, (gameState.day % 5)+5)
 		print(ticketClosed, (swid-texWid)/2, (shei-6)/2);
 	} else {
 		currentState = gameState;
