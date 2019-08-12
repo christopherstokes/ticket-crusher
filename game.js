@@ -98,7 +98,11 @@ p.update = function() {
 				sfx(0, getRandomInt(45,50));
 			}
 		}
-	} 
+	}
+	if(btnp(5)) {
+		// debug
+		currentState = gameoverState;
+	}
 	if (this.actionCountdown > 0) {
 		this.sprite = "action";
 		this.actionCountdown -= 1;
@@ -228,6 +232,55 @@ Explosion.prototype.draw = function() {
 	circ(this.x, this.y, this.rad, 6);
 }
 
+var Animation = function (frames, speed, startFrame) {
+	this.frames = frames || [];
+	this.speed = speed || 10;
+	this.currentFrame = startFrame || 0;
+	this.isFlipped = false;
+}
+
+Animation.prototype.update = function (currentTime) {
+	if (currentTime % this.speed == 0) {
+		if (this.currentFrame < this.frames.length - 1) {
+			this.currentFrame++;
+		} else {
+			this.currentFrame = 0;
+		}
+	}
+}
+
+Animation.prototype.draw = function (x, y) {
+	var f = this.frames[this.currentFrame];
+
+	spr(f.id, x, y, f.ck, f.scl, f.flp, f.rot, f.wid, f.hei);
+}
+
+Animation.prototype.flip = function () {
+	for (var f = 0; f < this.frames.length; f++) {
+		if (this.isFlipped == false) {
+			this.frames[f].flp = 1;
+		} else {
+			this.frames[f].flp = 0;
+		}
+	}
+
+	if (this.isFlipped == true) {
+		this.isFlipped = false;
+	} else {
+		this.isFlipped = true;
+	}
+}
+
+var Frame = function (id, wid, hei, ck, scl, flp, rot) {
+	this.id = id;
+	this.wid = wid || 1;
+	this.hei = hei || 1;
+	this.ck = ck || 0;
+	this.scl = scl || 1;
+	this.flp = flp || 0;
+	this.rot = rot || 0;
+}
+
 var menuState = {} 
 menuState.update = function() {
 	cls(0);
@@ -340,10 +393,44 @@ gameState.update = function() {
 	}
 }
 
+var bossAnimationFrames = [
+	new Frame(145, 2, 4, 0, 2),
+	new Frame(147, 2, 4, 0, 2),
+	new Frame(149, 2, 4, 0, 2),
+	new Frame(151, 2, 4, 0 ,2)
+]
+var bossAnimation = new Animation(bossAnimationFrames);
+
 var gameoverState = {};
 gameoverState.update = function() {
 	cls(0);
 	map(60, 0, 30, 17, 0, 0, 0);
+
+	bossAnimation.draw(swid-32, shei-64);
+	bossAnimation.update(fc);
+
+	var speechBubble = {
+		x: swid-72,
+		y: shei-40,
+		w: 34,
+		h: 16
+	}
+	rect(speechBubble.x, speechBubble.y, speechBubble.w, speechBubble.h, 15);
+	pix(speechBubble.x, speechBubble.y, 0);
+	pix(speechBubble.x, speechBubble.y+speechBubble.h-1, 0);
+	pix(speechBubble.x+speechBubble.w-1, speechBubble.y+speechBubble.h-1, 0);
+	
+	// triangle going from the two right corners of box and up towards mouth
+	tri(speechBubble.x+speechBubble.w, speechBubble.y,
+		speechBubble.x+speechBubble.w, speechBubble.y+(speechBubble.h/2),
+		speechBubble.x+speechBubble.w+8, speechBubble.y, 15);
+
+	if (fc % 60 > 15) {
+		print("YOU'RE", speechBubble.x+2, speechBubble.y+2, 0)
+	}	
+	if (fc % 60 > 30) {
+		print("FIRED!", speechBubble.x+2, speechBubble.y+9, 0)
+	}
 
 	// var yourFired = "YOU'VE BEEN FIRED!";
 	// var texWid = print(yourFired, 0, -32);
