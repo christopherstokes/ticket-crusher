@@ -327,6 +327,7 @@ gameState.dayState.update = function() {
 
 		var chgWid = (fc-gameState.dayFrame)/260;
 		var curWid = (fc-gameState.dayFrame) * EasingFunctions.easeOutCubic(chgWid);
+		trace(curWid);
 
 		rect((swid-curWid)/2,((shei-6)/2)-2, curWid, 10, (gameState.day % 5)+5)
 		print(ticketClosed, (swid-texWid)/2, (shei-6)/2);
@@ -665,7 +666,7 @@ function scanline(row) {
 // </WAVES>
 
 // <SFX>
-// 000:030803080308030803080308230053019302a301b301c300e300e300f300f300f300f300f300f300f300f300f300f300f300f300f300f300f300f300307000000000
+// 000:020802080208020802080208220052019202a201b201c200e200e200f200f200f200f200f200f200f200f200f200f200f200f200f200f200f200f200307000000000
 // 001:000100020002400f500d900fa000b000d001e001f001f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000310000000000
 // </SFX>
 
