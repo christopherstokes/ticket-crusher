@@ -380,12 +380,6 @@ gameState.update = function() {
 		currentState = gameoverState;
 	}
 
-	if (shake > 0) {
-		poke(0x3FF9+1,getRandomInt(-4, 4))
-		shake-=1		
-		if (shake==0) memset(0x3FF9,0,2);
-	}
-
 	if (tickets.length == 0) {
 		gameState.day += 1;
 		gameState.newWave(gameState.numTickets + 1, gameState.globalSpeed + 0.025, gameState.globalBounce - 0.025)
@@ -402,8 +396,41 @@ var bossAnimationFrames = [
 var bossAnimation = new Animation(bossAnimationFrames);
 
 var gameoverState = {};
+var fallingTickets = [];
 gameoverState.update = function() {
 	cls(0);
+
+	
+
+	if (fc % 2 == 0) {
+		var numTickets = getRandomInt(1,2);
+		for (var i=0; i<numTickets; i++) {
+			var t = {
+				x: getRandomInt(-32, swid-16),
+				y: -32,
+				dy: getRandomInt(2, 6),
+				scl: getRandomInt(1,3),
+				startfc: fc
+			}
+			fallingTickets.push(t);
+		}
+	}
+
+	for(var j=fallingTickets.length-1; j>=0; j--) {
+		var ticket = fallingTickets[j];
+		if ((fc-ticket.startfc) % 30 > 15) {
+			rect(ticket.x-(2*ticket.scl), ticket.y-(2*ticket.scl), (16*ticket.scl)+(4*ticket.scl), (16*ticket.scl)+(4*ticket.scl), 6)
+		}
+		spr(5, ticket.x, ticket.y, -1, ticket.scl, 0, 0, 2, 2);
+
+		ticket.y += ticket.dy;
+
+		if (ticket.y > shei+32 || ticket.x > swid + 32) {
+			fallingTickets.splice(j, 1);
+		}
+	}
+
+
 	map(60, 0, 30, 17, 0, 0, 0);
 
 	bossAnimation.draw(swid-32, shei-64);
@@ -412,7 +439,7 @@ gameoverState.update = function() {
 	var speechBubble = {
 		x: swid-72,
 		y: shei-40,
-		w: 34,
+		w: 35,
 		h: 16
 	}
 	rect(speechBubble.x, speechBubble.y, speechBubble.w, speechBubble.h, 15);
@@ -456,6 +483,13 @@ var currentState = menuState;
 function TIC()
 {
 	currentState.update();
+
+	if (shake > 0) {
+		poke(0x3FF9+1,getRandomInt(-4, 4))
+		shake-=1		
+		if (shake==0) memset(0x3FF9,0,2);
+	}
+
 	fc++;
 }
 
