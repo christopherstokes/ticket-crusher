@@ -101,7 +101,7 @@ p.update = function() {
 	}
 	if(btnp(5)) {
 		// debug
-		currentState = gameoverState;
+		// currentState = gameoverState;
 	}
 	if (this.actionCountdown > 0) {
 		this.sprite = "action";
