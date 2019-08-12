@@ -32,9 +32,7 @@ function getRandomInt(min, max) {
  */
 EasingFunctions = {
 	// no easing, no acceleration
-	linear: function (t, b, c, d) { 
-		return c * (t/d) + b;
-	},
+	linear: function (t) {return t},
 	// accelerating from zero velocity
 	easeInQuad: function (t) { return t*t },
 	// decelerating to zero velocity
@@ -327,7 +325,9 @@ gameState.dayState.update = function() {
 		var ticketClosed = "-- DAY " + gameState.day + " --";
 		var texWid = print(ticketClosed, 0, -32);
 
-		rect((swid-(fc-gameState.dayFrame))/2,((shei-6)/2)-2, fc-gameState.dayFrame, 10, (gameState.day % 5)+5)
+		var chg = 1/(gameState.dayFrame-fc);
+
+		rect((swid-(fc-gameState.dayFrame))/2,((shei-6)/2)-2, fc-(gameState.dayFrame * EasingFunctions.easeInQuad(chg)), 10, (gameState.day % 5)+5)
 		print(ticketClosed, (swid-texWid)/2, (shei-6)/2);
 	} else {
 		currentState = gameState;
