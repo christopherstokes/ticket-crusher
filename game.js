@@ -392,10 +392,9 @@ var bossAnimation = new Animation(bossAnimationFrames);
 
 var gameoverState = {};
 var fallingTickets = [];
+
 gameoverState.update = function() {
 	cls(0);
-
-	
 
 	if (fc % 2 == 0) {
 		var numTickets = getRandomInt(1,2);
@@ -466,8 +465,12 @@ gameoverState.update = function() {
 	texWid = print(restart, 0, -32);
 	print(restart, (swid-texWid)/2, (shei+24)/2);
 
+	p.update();
+	p.draw();
+
 
 	if (btnp(5)) {
+		fallingTickets = []
 		gameState.preload();
 		currentState = gameState;
 	}
