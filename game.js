@@ -321,11 +321,11 @@ gameState.newWave = function(num, speed, bounce) {
 
 gameState.dayState = {}
 gameState.dayState.update = function() {
-	if (fc < gameState.dayFrame+240) {
+	if (fc < gameState.dayFrame+260) {
 		var ticketClosed = "-- DAY " + gameState.day + " --";
 		var texWid = print(ticketClosed, 0, -32);
 
-		var chgWid = (fc-gameState.dayFrame)/240;
+		var chgWid = (fc-gameState.dayFrame)/260;
 		var curWid = (fc-gameState.dayFrame) * EasingFunctions.easeInOutCubic(chgWid)
 
 		rect((swid-curWid)/2,((shei-6)/2)-2, curWid, 10, (gameState.day % 5)+5)
