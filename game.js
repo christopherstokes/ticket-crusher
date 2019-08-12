@@ -327,7 +327,7 @@ gameState.dayState.update = function() {
 		var ticketClosed = "-- DAY " + gameState.day + " --";
 		var texWid = print(ticketClosed, 0, -32);
 
-		rect((swid-(fc-gameState.dayFrame))/2,((shei-6)/2)-2, fc-gameState.dayFrame, 10, gameState.day % 5)
+		rect((swid-(fc-gameState.dayFrame))/2,((shei-6)/2)-2, fc-gameState.dayFrame, 10, (gameState.day % 5)+5)
 		print(ticketClosed, (swid-texWid)/2, (shei-6)/2);
 	} else {
 		currentState = gameState;
