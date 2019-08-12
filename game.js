@@ -326,7 +326,7 @@ gameState.dayState.update = function() {
 		var texWid = print(ticketClosed, 0, -32);
 
 		var chgWid = (fc-gameState.dayFrame)/260;
-		var curWid = (fc-gameState.dayFrame) * EasingFunctions.easeInOutCubic(chgWid)
+		var curWid = (fc-gameState.dayFrame) * EasingFunctions.easeOutCubic(chgWid);
 
 		rect((swid-curWid)/2,((shei-6)/2)-2, curWid, 10, (gameState.day % 5)+5)
 		print(ticketClosed, (swid-texWid)/2, (shei-6)/2);
