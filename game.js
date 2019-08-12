@@ -297,6 +297,7 @@ var gameState = {};
 gameState.score = 0;
 gameState.missed = 0;
 gameState.day = 1;
+gameState.dayFrame = 0;
 gameState.globalSpeed;
 gameState.globalBounce;
 gameState.numTickets;
@@ -305,24 +306,40 @@ gameState.preload = function() {
 	gameState.missed = 0;
 	tickets = [];
 	explosions = [];
+	fc = 0;
 	gameState.newWave(5, 0.5, 3);
 }
 gameState.newWave = function(num, speed, bounce) {
 	gameState.numTickets = num;
 	gameState.globalSpeed = speed;
 	gameState.globalBounce = bounce;
+	gameState.dayFrame = fc;
 
 	for (var i=0; i<gameState.numTickets; i++) {
 		var t = new Ticket(gameState.globalSpeed, gameState.globalBounce);
 		tickets.push(t);
 	}
 }
+
+gameState.dayState = {}
+gameState.dayState.update = function() {
+	if (fc < gameState.dayFrame+240) {
+		var ticketClosed = "-- DAY " + gameState.day + " --";
+		var texWid = print(ticketClosed, 0, -32);
+
+		rect((swid-(fc-gameState.dayFrame))/2,((shei-6)/2)-2, fc-gameState.dayFrame, 10, gameState.day % 5)
+		print(ticketClosed, (swid-texWid)/2, (shei-6)/2);
+	} else {
+		currentState = gameState;
+	}
+}
+
 gameState.update = function() {
 	cls(13);
 	rect(0, 0, swid, 16, 1)
 	map(0, 0, 30, 17, 0, -8, 0);
 	print("https://goodertrack.com", 4, 10, 0)
-	
+
 	for (var t=tickets.length-1; t>-1; t--) {
 		if (!tickets[t].alive) {
 			if ((getRandomInt(0, 10) > 8) && tickets[t].x > 32 && tickets[t].x < swid - 32 
@@ -362,6 +379,11 @@ gameState.update = function() {
 	p.update();
 	p.draw();
 
+
+	if (fc < 30) {
+		currentState = gameState.dayState;
+	}
+
 	var TCtext = "CLOSED: "+this.score;
 	var TMtext = "MISSED: "+this.missed;
 
@@ -371,15 +393,16 @@ gameState.update = function() {
 	var texWid = print(TMtext, 0, -32);
 	print(TMtext, (swid-(texWid+5)), shei-7);
 
+	if (tickets.length == 0) {
+		gameState.day += 1;
+		gameState.newWave(gameState.numTickets + 1, gameState.globalSpeed + 0.01, gameState.globalBounce - 0.001)
+		currentState = gameState.dayState;
+	}
+
 	if (this.missed > this.score/2) {
 		currentState = gameoverState;
 	}
 
-	if (tickets.length == 0) {
-		gameState.day += 1;
-		gameState.newWave(gameState.numTickets + 1, gameState.globalSpeed + 0.025, gameState.globalBounce - 0.025)
-
-	}
 }
 
 var bossAnimationFrames = [
@@ -470,7 +493,7 @@ gameoverState.update = function() {
 
 
 	if (btnp(5)) {
-		fallingTickets = []
+		fallingTickets = [];
 		gameState.preload();
 		currentState = gameState;
 	}
@@ -491,8 +514,7 @@ function TIC()
 	fc++;
 }
 
-function scanline() 
-{
+function scanline(row) {
 	if (shake > 0) poke(0x3FF9,getRandomInt(-(shaked),shaked))
 }
 
