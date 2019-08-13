@@ -3,9 +3,9 @@
 // desc:   Completely accurate simulation of Technical Support
 // script: js
 
-var fc=0 //ongoing frame counter
-var shake=0 //screen shake
-var shaked=0 //shake distance
+var fc = 0 //ongoing frame counter
+var shake = 0 //screen shake
+var shaked = 0 //shake distance
 
 var swid = 240;
 var shei = 136;
@@ -13,10 +13,10 @@ var shei = 136;
 // utility
 function collides(objA, objB) {
 	if (objA.x < objB.x + objB.wid &&
-   objA.x + objA.wid > objB.x &&
-   objA.y < objB.y + objB.hei &&
-   objA.y + objA.hei > objB.y) {
-    return true;
+		objA.x + objA.wid > objB.x &&
+		objA.y < objB.y + objB.hei &&
+		objA.y + objA.hei > objB.y) {
+		return true;
 	}
 }
 
@@ -32,31 +32,57 @@ function getRandomInt(min, max) {
  */
 EasingFunctions = {
 	// no easing, no acceleration
-	linear: function (t) {return t},
+	linear: function (t) {
+		return t
+	},
 	// accelerating from zero velocity
-	easeInQuad: function (t) { return t*t },
+	easeInQuad: function (t) {
+		return t * t
+	},
 	// decelerating to zero velocity
-	easeOutQuad: function (t) { return t*(2-t) },
+	easeOutQuad: function (t) {
+		return t * (2 - t)
+	},
 	// acceleration until halfway, then deceleration
-	easeInOutQuad: function (t) { return t<.5 ? 2*t*t : -1+(4-2*t)*t },
+	easeInOutQuad: function (t) {
+		return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+	},
 	// accelerating from zero velocity 
-	easeInCubic: function (t) { return t*t*t },
+	easeInCubic: function (t) {
+		return t * t * t
+	},
 	// decelerating to zero velocity 
-	easeOutCubic: function (t) { return (--t)*t*t+1 },
+	easeOutCubic: function (t) {
+		return (--t) * t * t + 1
+	},
 	// acceleration until halfway, then deceleration 
-	easeInOutCubic: function (t) { return t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1 },
+	easeInOutCubic: function (t) {
+		return t < .5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1
+	},
 	// accelerating from zero velocity 
-	easeInQuart: function (t) { return t*t*t*t },
+	easeInQuart: function (t) {
+		return t * t * t * t
+	},
 	// decelerating to zero velocity 
-	easeOutQuart: function (t) { return 1-(--t)*t*t*t },
+	easeOutQuart: function (t) {
+		return 1 - (--t) * t * t * t
+	},
 	// acceleration until halfway, then deceleration
-	easeInOutQuart: function (t) { return t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t },
+	easeInOutQuart: function (t) {
+		return t < .5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t
+	},
 	// accelerating from zero velocity
-	easeInQuint: function (t) { return t*t*t*t*t },
+	easeInQuint: function (t) {
+		return t * t * t * t * t
+	},
 	// decelerating to zero velocity
-	easeOutQuint: function (t) { return 1+(--t)*t*t*t*t },
+	easeOutQuint: function (t) {
+		return 1 + (--t) * t * t * t * t
+	},
 	// acceleration until halfway, then deceleration 
-	easeInOutQuint: function (t) { return t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t }
+	easeInOutQuint: function (t) {
+		return t < .5 ? 16 * t * t * t * t * t : 1 + 16 * (--t) * t * t * t * t
+	}
 }
 
 // Player
@@ -65,7 +91,7 @@ var p = {
 	"y": 24,
 	"wid": 32,
 	"hei": 32,
-	"sprites": { 
+	"sprites": {
 		"idle": 1,
 		"action": 3
 	},
@@ -73,19 +99,24 @@ var p = {
 	"actionCountdown": 0
 }
 
-p.update = function() {
-	if(btn(0) && this.y>0) this.y--
-	if(btn(1) && this.y<shei-this.hei) this.y++
-	if(btn(2) && this.x> -(this.wid/2)) this.x--
-	if(btn(3) && this.x<swid-this.wid/2) this.x++
-	if(btnp(4)) {
+p.update = function () {
+	if (btn(0) && this.y > 0) this.y--
+	if (btn(1) && this.y < shei - this.hei) this.y++
+	if (btn(2) && this.x > -(this.wid / 2)) this.x--
+	if (btn(3) && this.x < swid - this.wid / 2) this.x++
+	if (btnp(4)) {
 		this.actionCountdown = 10;
-		
-		for (var t=0; t<tickets.length; t++) {
 
-			if (collides({'x': this.x, 'y': this.y, 'wid': this.wid/2, 'hei': this.hei/2}, tickets[t]) && tickets[t].alive) {
-				for (var i=0; i<5; i++) {
-					var e = new Explosion(tickets[t].x+(tickets[t].wid/2), tickets[t].y+(tickets[t].hei/2));
+		for (var t = 0; t < tickets.length; t++) {
+
+			if (collides({
+					'x': this.x,
+					'y': this.y,
+					'wid': this.wid / 2,
+					'hei': this.hei / 2
+				}, tickets[t]) && tickets[t].alive) {
+				for (var i = 0; i < 5; i++) {
+					var e = new Explosion(tickets[t].x + (tickets[t].wid / 2), tickets[t].y + (tickets[t].hei / 2));
 					explosions.push(e);
 				}
 
@@ -93,13 +124,13 @@ p.update = function() {
 				gameState.score += 1;
 				shaked = getRandomInt(3, 4);
 				shake = 5;
-				sfx(0, getRandomInt(45,50));
+				sfx(0, getRandomInt(45, 50));
 			}
 		}
 	}
-	if(btnp(5)) {
+	if (btnp(5)) {
 		// debug
-		// currentState = gameoverState;
+		currentState = gameoverState;
 	}
 	if (this.actionCountdown > 0) {
 		this.sprite = "action";
@@ -109,19 +140,19 @@ p.update = function() {
 	}
 }
 
-p.draw = function() {
+p.draw = function () {
 	spr(this.sprites[this.sprite],
-					this.x,
-					this.y,
-					1,2,0,0,2,2)
+		this.x,
+		this.y,
+		1, 2, 0, 0, 2, 2)
 }
 
 // tickets
 var tickets = []
 
-var Ticket = function(speed, bounce, x, y, dx, dy, w, h, spr) {
-	this.x = x || getRandomInt(16,swid-16);
-	this.y = y || getRandomInt(16,shei-24);
+var Ticket = function (speed, bounce, x, y, dx, dy, w, h, spr) {
+	this.x = x || getRandomInt(16, swid - 16);
+	this.y = y || getRandomInt(16, shei - 24);
 	this.sprite = spr || 5;
 	this.wid = w || 16;
 	this.hei = h || 16;
@@ -131,65 +162,65 @@ var Ticket = function(speed, bounce, x, y, dx, dy, w, h, spr) {
 	this.rebound = 0;
 
 	if (dx) {
-		this.dx = this.speed*dx;
+		this.dx = this.speed * dx;
 	} else {
-		if (this.x <= swid/2)
+		if (this.x <= swid / 2)
 			this.dx = this.speed;
-		
-		if (this.x > swid/2)
+
+		if (this.x > swid / 2)
 			this.dx = (-1 * this.speed);
 	}
 
 	if (dy) {
-		this.dy = this.speed*dy;
+		this.dy = this.speed * dy;
 	} else {
-		if (this.y <= shei/2)
+		if (this.y <= shei / 2)
 			this.dy = this.speed;
-		
-		if (this.y > shei/2)
+
+		if (this.y > shei / 2)
 			this.dy = (-1 * this.speed);
-	}	
+	}
 }
 
 var pentatonicScale = [0, 2, 3, 4, 6]
 
-Ticket.prototype.update = function() {
+Ticket.prototype.update = function () {
 	this.x += this.dx;
 	this.y += this.dy;
-	
-	if ((this.x < 0 || this.x > swid-this.wid) && this.bounce >= 0) {
+
+	if ((this.x < 0 || this.x > swid - this.wid) && this.bounce >= 0) {
 		this.dx = this.dx * -1;
-		this.bounce -=1;
-		shaked = getRandomInt(1,3);
+		this.bounce -= 1;
+		shaked = getRandomInt(1, 3);
 		shake = 2;
 		if (this.wid == 16) {
 			shaked = 2;
-			sfx(1, 3*12 + pentatonicScale[getRandomInt(0, pentatonicScale.length-1)]);
+			sfx(1, 3 * 12 + pentatonicScale[getRandomInt(0, pentatonicScale.length - 1)]);
 		} else if (this.wid == 8) {
 			shaked = 1;
-			sfx(1, 4*12 + pentatonicScale[getRandomInt(0, pentatonicScale.length-1)]);
+			sfx(1, 4 * 12 + pentatonicScale[getRandomInt(0, pentatonicScale.length - 1)]);
 		}
 	}
-	
-	if ((this.y < 16 || this.y > (shei-this.wid-8)) && this.bounce >= 0) {
+
+	if ((this.y < 16 || this.y > (shei - this.wid - 8)) && this.bounce >= 0) {
 		this.dy = this.dy * -1;
-		this.bounce -=1;
+		this.bounce -= 1;
 		shake = 2;
 		if (this.wid == 16) {
 			shaked = 2;
-			sfx(1, 3*12 + pentatonicScale[getRandomInt(0, pentatonicScale.length-1)]);
+			sfx(1, 3 * 12 + pentatonicScale[getRandomInt(0, pentatonicScale.length - 1)]);
 		} else if (this.wid == 8) {
 			shaked = 1;
-			sfx(1, 4*12 + pentatonicScale[getRandomInt(0, pentatonicScale.length-1)]);
+			sfx(1, 4 * 12 + pentatonicScale[getRandomInt(0, pentatonicScale.length - 1)]);
 		}
 	}
-	
-	if ((this.x < -1 || this.x > swid+1 || this.y < 15 || this.y > shei-8) && this.bounce < 0) {
+
+	if ((this.x < -1 || this.x > swid + 1 || this.y < 15 || this.y > shei - 8) && this.bounce < 0) {
 		this.alive = false;
 		gameState.missed += 1;
 	}
 
-	for (var t=0; t<tickets.length; t++) {
+	for (var t = 0; t < tickets.length; t++) {
 		if (this != tickets[t]) {
 			if (collides(this, tickets[t]) && this.rebound != tickets[t]) {
 				this.dx = this.dx * -1;
@@ -199,19 +230,19 @@ Ticket.prototype.update = function() {
 		}
 	}
 
-	if (this.rebound > 0) this.rebound -=1;
+	if (this.rebound > 0) this.rebound -= 1;
 }
 
-Ticket.prototype.draw = function() {
-	if (this.bounce < 1 && fc%30 < 15) {
-		rect(this.x-this.wid/8, this.y-this.hei/8, this.wid+(this.wid/4), this.hei+(this.hei/4), 6);
-	} 
-	spr(this.sprite, this.x, this.y, -1, 1, 0, 0, this.wid/8, this.hei/8);
+Ticket.prototype.draw = function () {
+	if (this.bounce < 1 && fc % 30 < 15) {
+		rect(this.x - this.wid / 8, this.y - this.hei / 8, this.wid + (this.wid / 4), this.hei + (this.hei / 4), 6);
+	}
+	spr(this.sprite, this.x, this.y, -1, 1, 0, 0, this.wid / 8, this.hei / 8);
 }
 
 var explosions = [];
 
-var Explosion = function(x, y, rad, time, dx, dy) {
+var Explosion = function (x, y, rad, time, dx, dy) {
 	this.x = x;
 	this.y = y;
 	this.dx = dx || getRandomInt(0, 2) - 1;
@@ -221,7 +252,7 @@ var Explosion = function(x, y, rad, time, dx, dy) {
 	this.alive = true;
 }
 
-Explosion.prototype.update = function() {
+Explosion.prototype.update = function () {
 	this.rad -= 0.25;
 	this.time -= 1;
 	this.x += this.dx;
@@ -232,8 +263,8 @@ Explosion.prototype.update = function() {
 	}
 }
 
-Explosion.prototype.draw = function() {
-	circ(this.x, this.y, this.rad+1, 0);
+Explosion.prototype.draw = function () {
+	circ(this.x, this.y, this.rad + 1, 0);
 	circ(this.x, this.y, this.rad, 6);
 }
 
@@ -286,19 +317,19 @@ var Frame = function (id, wid, hei, ck, scl, flp, rot) {
 	this.rot = rot || 0;
 }
 
-var menuState = {} 
-menuState.update = function() {
+var menuState = {}
+menuState.update = function () {
 	cls(0);
 	map(30, 0, 30, 17, 0, 0, 0);
 	var bystatement = "A GAME BY CHRISTOPHER STOKES"
 	var texWid = print(bystatement, 0, -32);
-	print(bystatement, (swid-texWid)/2, (shei-12)/2);
+	print(bystatement, (swid - texWid) / 2, (shei - 12) / 2);
 
 	var subtitle = "PRESS X TO START";
 	texWid = print(subtitle, 0, -32);
-	print(subtitle, (swid-texWid)/2, (shei+12)/2);
-	
-	if (btn(5)){
+	print(subtitle, (swid - texWid) / 2, (shei + 12) / 2);
+
+	if (btn(5)) {
 		gameState.preload();
 		currentState = gameState;
 	}
@@ -312,7 +343,7 @@ gameState.dayFrame = 0;
 gameState.globalSpeed;
 gameState.globalBounce;
 gameState.numTickets;
-gameState.preload = function() {
+gameState.preload = function () {
 	gameState.score = 0;
 	gameState.missed = 0;
 	tickets = [];
@@ -321,61 +352,58 @@ gameState.preload = function() {
 	gameState.newWave(5, 0.5, 5);
 	// music(0);
 }
-gameState.newWave = function(num, speed, bounce) {
+gameState.newWave = function (num, speed, bounce) {
 	gameState.numTickets = num;
 	gameState.globalSpeed = speed;
 	gameState.globalBounce = bounce;
 	gameState.dayFrame = fc;
 
-	for (var i=0; i<gameState.numTickets; i++) {
+	for (var i = 0; i < gameState.numTickets; i++) {
 		var t = new Ticket(gameState.globalSpeed, gameState.globalBounce);
 		tickets.push(t);
 	}
 }
 
 gameState.dayState = {}
-gameState.dayState.update = function() {
-	if (fc < gameState.dayFrame+260) {
+gameState.dayState.update = function () {
+	if (fc < gameState.dayFrame + 260) {
 		var ticketClosed = "-- DAY " + gameState.day + " --";
 		var texWid = print(ticketClosed, 0, -32);
 
-		var chgWid = (fc-gameState.dayFrame)/260;
-		var curWid = (fc-gameState.dayFrame) * EasingFunctions.easeOutCubic(chgWid);
+		var chgWid = (fc - gameState.dayFrame) / 260;
+		var curWid = (fc - gameState.dayFrame) * EasingFunctions.easeOutCubic(chgWid);
 		// trace(curWid);
 
-		rect((swid-curWid)/2,((shei-6)/2)-2, curWid, 10, (gameState.day % 5)+5)
-		print(ticketClosed, (swid-texWid)/2, (shei-6)/2);
+		rect((swid - curWid) / 2, ((shei - 6) / 2) - 2, curWid, 10, (gameState.day % 5) + 5)
+		print(ticketClosed, (swid - texWid) / 2, (shei - 6) / 2);
 	} else {
 		currentState = gameState;
 	}
 }
 
-gameState.update = function() {
+gameState.update = function () {
 	cls(13);
 	rect(0, 0, swid, 16, 1)
 	map(0, 0, 30, 17, 0, -8, 0);
 	print("https://goodertrack.com", 4, 10, 0)
 
-	for (var t=tickets.length-1; t>-1; t--) {
+	for (var t = tickets.length - 1; t > -1; t--) {
 		if (!tickets[t].alive) {
-			if ((getRandomInt(0, 10) > 8) && tickets[t].x > 32 && tickets[t].x < swid - 32 
-					&& tickets[t].y > 32 && tickets[t].y < shei-32) {
-				var subTickets =  [
-					new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x-tickets[t].wid, tickets[t].y-tickets[t].hei, -(gameState.globalSpeed), -1, 8, 8, 53)
-					,new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x+tickets[t].wid, tickets[t].y+tickets[t].hei, gameState.globalSpeed, gameState.globalSpeed, 8, 8, 53)
-					,new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x-tickets[t].wid, tickets[t].y+tickets[t].hei, -(gameState.globalSpeed), gameState.globalSpeed, 8, 8, 53)
-					,new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x+tickets[t].wid, tickets[t].y-tickets[t].hei, gameState.globalSpeed, -(gameState.globalSpeed), 8, 8, 53)
+			if ((getRandomInt(0, 10) > 8) && tickets[t].x > 32 && tickets[t].x < swid - 32 &&
+				tickets[t].y > 32 && tickets[t].y < shei - 32) {
+				var subTickets = [
+					new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x - tickets[t].wid, tickets[t].y - tickets[t].hei, -(gameState.globalSpeed), -1, 8, 8, 53), new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x + tickets[t].wid, tickets[t].y + tickets[t].hei, gameState.globalSpeed, gameState.globalSpeed, 8, 8, 53), new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x - tickets[t].wid, tickets[t].y + tickets[t].hei, -(gameState.globalSpeed), gameState.globalSpeed, 8, 8, 53), new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x + tickets[t].wid, tickets[t].y - tickets[t].hei, gameState.globalSpeed, -(gameState.globalSpeed), 8, 8, 53)
 				]
-				subTickets.forEach(function(t) {
+				subTickets.forEach(function (t) {
 					tickets.push(t);
-					for (var e=0; e<5; e++) {
+					for (var e = 0; e < 5; e++) {
 						explosions.push(
-							new Explosion(t.x+t.wid/2, t.y+t.hei/2, 
-								getRandomInt(2,5), getRandomInt(15, 45), 
+							new Explosion(t.x + t.wid / 2, t.y + t.hei / 2,
+								getRandomInt(2, 5), getRandomInt(15, 45),
 								-(t.dx * 0.75), -(t.dy * 0.75)));
 					}
 				});
-				sfx(0, getRandomInt(5*12,5*12+12));
+				sfx(0, getRandomInt(5 * 12, 5 * 12 + 12));
 			}
 			tickets.splice(t, 1);
 		} else {
@@ -384,7 +412,7 @@ gameState.update = function() {
 		}
 	}
 
-	for (e=explosions.length-1; e>-1; e--) {
+	for (e = explosions.length - 1; e > -1; e--) {
 		if (!explosions[e].alive) {
 			explosions.splice(e, 1);
 		} else {
@@ -392,7 +420,7 @@ gameState.update = function() {
 			explosions[e].draw();
 		}
 	}
-	
+
 	p.update();
 	p.draw();
 
@@ -401,23 +429,23 @@ gameState.update = function() {
 		currentState = gameState.dayState;
 	}
 
-	var TCtext = "CLOSED: "+this.score;
-	var TMtext = "MISSED: "+this.missed;
+	var TCtext = "CLOSED: " + this.score;
+	var TMtext = "MISSED: " + this.missed;
 
 
-	rect(0, shei-8, 240, 8, 0)
-	print(TCtext, 5, shei-7);
+	rect(0, shei - 8, 240, 8, 0)
+	print(TCtext, 5, shei - 7);
 	var texWid = print(TMtext, 0, -32);
-	print(TMtext, (swid-(texWid+5)), shei-7);
+	print(TMtext, (swid - (texWid + 5)), shei - 7);
 
 	if (tickets.length == 0) {
 		gameState.day += 1;
-		var curveMod = EasingFunctions.easeInCubic(((gameState.day % 5) + 1)/5);
+		var curveMod = EasingFunctions.easeInCubic(((gameState.day % 5) + 1) / 5);
 		gameState.newWave(gameState.numTickets + (2 * curveMod), gameState.globalSpeed + (0.1 * curveMod), gameState.globalBounce - (0.01 * curveMod))
 		currentState = gameState.dayState;
 	}
 
-	if (this.missed > this.score/2) {
+	if (this.missed > this.score / 2) {
 		music();
 		currentState = gameoverState;
 	}
@@ -428,40 +456,53 @@ var bossAnimationFrames = [
 	new Frame(145, 2, 4, 0, 2),
 	new Frame(147, 2, 4, 0, 2),
 	new Frame(149, 2, 4, 0, 2),
-	new Frame(151, 2, 4, 0 ,2)
+	new Frame(151, 2, 4, 0, 2)
 ]
 var bossAnimation = new Animation(bossAnimationFrames);
+
+var bossAnimationPunchFrames = [
+	new Frame(153, 2, 4, 0, 2),
+	new Frame(155, 2, 4, 0, 2)
+]
+var bossAnimationPunch = new Animation(bossAnimationPunchFrames)
+
+var boss = {}
+boss.animations = {
+	"idle": bossAnimation,
+	"punched": bossAnimationPunch
+}
+boss.currentAnimation = "punched";
 
 var gameoverState = {};
 var fallingTickets = [];
 
-gameoverState.update = function() {
+gameoverState.update = function () {
 	cls(0);
 
 	if (fc % 2 == 0) {
-		var numTickets = getRandomInt(1,2);
-		for (var i=0; i<numTickets; i++) {
+		var numTickets = getRandomInt(1, 2);
+		for (var i = 0; i < numTickets; i++) {
 			var t = {
-				x: getRandomInt(-32, swid-16),
+				x: getRandomInt(-32, swid - 16),
 				y: -32,
 				dy: getRandomInt(2, 6),
-				scl: getRandomInt(1,3),
+				scl: getRandomInt(1, 3),
 				startfc: fc
 			}
 			fallingTickets.push(t);
 		}
 	}
 
-	for(var j=fallingTickets.length-1; j>-1; j--) {
+	for (var j = fallingTickets.length - 1; j > -1; j--) {
 		var ticket = fallingTickets[j];
-		if ((fc-ticket.startfc) % 30 > 15) {
-			rect(ticket.x-(2*ticket.scl), ticket.y-(2*ticket.scl), (16*ticket.scl)+(4*ticket.scl), (16*ticket.scl)+(4*ticket.scl), 6)
+		if ((fc - ticket.startfc) % 30 > 15) {
+			rect(ticket.x - (2 * ticket.scl), ticket.y - (2 * ticket.scl), (16 * ticket.scl) + (4 * ticket.scl), (16 * ticket.scl) + (4 * ticket.scl), 6)
 		}
 		spr(5, ticket.x, ticket.y, -1, ticket.scl, 0, 0, 2, 2);
 
 		ticket.y += ticket.dy;
 
-		if (ticket.y > shei+32 || ticket.x > swid + 32) {
+		if (ticket.y > shei + 32 || ticket.x > swid + 32) {
 			fallingTickets.splice(j, 1);
 		}
 	}
@@ -469,43 +510,43 @@ gameoverState.update = function() {
 
 	map(60, 0, 30, 17, 0, 0, 0);
 
-	bossAnimation.draw(swid-32, shei-64);
-	bossAnimation.update(fc);
+	boss.animations[boss.currentAnimation].draw(swid - 32, shei - 64);
+	boss.animations[boss.currentAnimation].update(fc);
 
-	var speechBubble = {
-		x: swid-72,
-		y: shei-40,
-		w: 35,
-		h: 16
+	if (boss.currentAnimation != "punched") {
+		var speechBubble = {
+			x: swid - 72,
+			y: shei - 40,
+			w: 35,
+			h: 16
+		}
+		rect(speechBubble.x, speechBubble.y, speechBubble.w, speechBubble.h, 15);
+		pix(speechBubble.x, speechBubble.y, 0);
+		pix(speechBubble.x, speechBubble.y + speechBubble.h - 1, 0);
+		pix(speechBubble.x + speechBubble.w - 1, speechBubble.y + speechBubble.h - 1, 0);
+
+		// triangle going from the two right corners of box and up towards mouth
+		tri(speechBubble.x + speechBubble.w, speechBubble.y,
+			speechBubble.x + speechBubble.w, speechBubble.y + (speechBubble.h / 2),
+			speechBubble.x + speechBubble.w + 8, speechBubble.y, 15);
+
+
+		if (fc % 60 > 15) {
+			print("YOU'RE", speechBubble.x + 2, speechBubble.y + 2, 0)
+		}
+		if (fc % 60 > 30) {
+			print("FIRED!", speechBubble.x + 2, speechBubble.y + 9, 0)
+		}
 	}
-	rect(speechBubble.x, speechBubble.y, speechBubble.w, speechBubble.h, 15);
-	pix(speechBubble.x, speechBubble.y, 0);
-	pix(speechBubble.x, speechBubble.y+speechBubble.h-1, 0);
-	pix(speechBubble.x+speechBubble.w-1, speechBubble.y+speechBubble.h-1, 0);
-	
-	// triangle going from the two right corners of box and up towards mouth
-	tri(speechBubble.x+speechBubble.w, speechBubble.y,
-		speechBubble.x+speechBubble.w, speechBubble.y+(speechBubble.h/2),
-		speechBubble.x+speechBubble.w+8, speechBubble.y, 15);
 
-	if (fc % 60 > 15) {
-		print("YOU'RE", speechBubble.x+2, speechBubble.y+2, 0)
-	}	
-	if (fc % 60 > 30) {
-		print("FIRED!", speechBubble.x+2, speechBubble.y+9, 0)
-	}
 
-	// var yourFired = "YOU'VE BEEN FIRED!";
-	// var texWid = print(yourFired, 0, -32);
-	// print(yourFired, (swid-texWid)/2, (shei-12)/2);
-	
 	var ticketClosed = "You managed to close " + gameState.score + " tickets!";
 	texWid = print(ticketClosed, 0, -32);
-	print(ticketClosed, (swid-texWid)/2, (shei-12)/2);
+	print(ticketClosed, (swid - texWid) / 2, (shei - 12) / 2);
 
 	var restart = "PRESS X TO RESTART";
 	texWid = print(restart, 0, -32);
-	print(restart, (swid-texWid)/2, (shei+24)/2);
+	print(restart, (swid - texWid) / 2, (shei + 24) / 2);
 
 	p.update();
 	p.draw();
@@ -520,21 +561,20 @@ gameoverState.update = function() {
 
 var currentState = menuState;
 
-function TIC()
-{
+function TIC() {
 	currentState.update();
 
 	if (shake > 0) {
-		poke(0x3FF9+1,getRandomInt(-4, 4))
-		shake-=1		
-		if (shake==0) memset(0x3FF9,0,2);
+		poke(0x3FF9 + 1, getRandomInt(-4, 4))
+		shake -= 1
+		if (shake == 0) memset(0x3FF9, 0, 2);
 	}
 
 	fc++;
 }
 
 function scanline(row) {
-	if (shake > 0) poke(0x3FF9,getRandomInt(-(shaked),shaked))
+	if (shake > 0) poke(0x3FF9, getRandomInt(-(shaked), shaked))
 }
 
 // <TILES>
@@ -630,8 +670,8 @@ function scanline(row) {
 // 152:000000000000000033000000443000004443000044443030433333303ccce300
 // 153:000000000000003300000344000034440303444403333334003eccc300eecccc
 // 154:0000000033000000443000004443000044443030433333303ccce300ccccee00
-// 155:000000000000000000000033000003440000344403034444033333340030ecc3
-// 156:000000000000000033000000443000004443000044443030433333303cce0300
+// 155:000000000000000000000033000003440000344403034444033333340030eee3
+// 156:000000000000000033000000443000004443000044443030433333303eee0300
 // 161:0eecc3cc003ccccc003cc3330003c3ff0003cc3300343ccc033443333f3443ff
 // 162:cc3ccee0ccccc300333cc300ff3c300033cc3000ccc3430033344330ff3443f3
 // 163:00ee333c0eecc3cc003ccccc003ccccc0003c3330033cc3303343ccc3f344333
@@ -642,8 +682,8 @@ function scanline(row) {
 // 168:c333ee00cc3ccee0ccccc300ccccc300333c300033cc3000ccc3430033344330
 // 169:00eecffc0eeccffc003ccccc003ccfff0003c3330003cc3303343ccf3f3443cc
 // 170:cffcee00cffccee0ccccc300fffcc300333c300033cc3000fcc34330cc3443f3
-// 171:000ecccc00eecccc00eec3cc0eeccccc003ccccc0003ccc30003ccc333343ccc
-// 172:cccce000ccccee00cc3cee00cccccee0ccccc3003ccc30003ccc3000ccc34330
+// 171:0000eccc000ecccc00eecccc00eec3cc0eeccccc003ccccc0003ccc30003ccc3
+// 172:ccce0000cccce000ccccee00cc3cee00cccccee0ccccc3003ccc30003ccc3000
 // 177:3f3443ff3f3443ff033443ff0c3443ff0c3443ff0c3333330cc888830cc88883
 // 178:ff3443f3ff3443f3ff344330ff3443c0ff3443c0333333c088888cc088888cc0
 // 179:3f3443ff3f3443ff033443ff0c3443ff0c3443ff0c3333330cc888830cc88883
@@ -654,8 +694,8 @@ function scanline(row) {
 // 184:ff3443f3ff3443f3ff3443f3ff344330ff3443c0ff3443c0333333c088888cc0
 // 185:3f3443333f3443ff033443ff0c3443ff0c3443ff0ccc333300cc888300388883
 // 186:333443f3ff3443f3ff344330ff3443c0ff3443c03333ccc08888cc0088888300
-// 187:3f3443cc3f3443330f3443ff033443ff0c3443ff0cccc3ff003cc33300388883
-// 188:cc3443f3333443f3ff3443f3ff344330ff3443c0ff3cccc0333cc30088888300
+// 187:33343ccc3f3443cc3f3443330f3443ff033443ff0c3443ff0cccc3ff003cc333
+// 188:ccc34330cc3443f3333443f3ff3443f3ff344330ff3443c0ff3cccc0333cc300
 // 193:0038888300388833003888300038883000344430034444300033333000000000
 // 194:8888830033888300038883000388830003444300034444300333330000000000
 // 195:0038888300388833003888300038883000344430034444300033333000000000
