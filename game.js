@@ -317,6 +317,9 @@ p.update = function () {
 			this.actionCountdown = 20;
 			this.currentAnimation = "punch";
 			boss.currentAnimation = "punched";
+
+			shake=4
+			shaked=4
 		}
 	}
 
