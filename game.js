@@ -162,15 +162,26 @@ Ticket.prototype.update = function() {
 		this.bounce -=1;
 		shaked = getRandomInt(1,3);
 		shake = 2;
-		sfx(1, 3*12 + pentatonicScale[getRandomInt(0, pentatonicScale.length-1)]);
+		if (this.wid == 16) {
+			shaked = 2;
+			sfx(1, 3*12 + pentatonicScale[getRandomInt(0, pentatonicScale.length-1)]);
+		} else if (this.wid == 8) {
+			shaked = 1;
+			sfx(1, 4*12 + pentatonicScale[getRandomInt(0, pentatonicScale.length-1)]);
+		}
 	}
 	
 	if ((this.y < 16 || this.y > (shei-this.wid-8)) && this.bounce >= 0) {
 		this.dy = this.dy * -1;
 		this.bounce -=1;
-		shaked = getRandomInt(1,3);
 		shake = 2;
-		sfx(1, 3*12 + pentatonicScale[getRandomInt(0, pentatonicScale.length-1)]);
+		if (this.wid == 16) {
+			shaked = 2;
+			sfx(1, 3*12 + pentatonicScale[getRandomInt(0, pentatonicScale.length-1)]);
+		} else if (this.wid == 8) {
+			shaked = 1;
+			sfx(1, 4*12 + pentatonicScale[getRandomInt(0, pentatonicScale.length-1)]);
+		}
 	}
 	
 	if ((this.x < -1 || this.x > swid+1 || this.y < 15 || this.y > shei-8) && this.bounce < 0) {
@@ -193,7 +204,7 @@ Ticket.prototype.update = function() {
 
 Ticket.prototype.draw = function() {
 	if (this.bounce < 1 && fc%30 < 15) {
-		rect(this.x-2, this.y-2, this.wid+(this.wid/4), this.hei+(this.hei/4), 6);
+		rect(this.x-this.wid/8, this.y-this.hei/8, this.wid+(this.wid/4), this.hei+(this.hei/4), 6);
 	} 
 	spr(this.sprite, this.x, this.y, -1, 1, 0, 0, this.wid/8, this.hei/8);
 }
@@ -402,7 +413,7 @@ gameState.update = function() {
 	if (tickets.length == 0) {
 		gameState.day += 1;
 		var curveMod = EasingFunctions.easeInCubic(((gameState.day % 5) + 1)/5);
-		gameState.newWave(gameState.numTickets + (1 * curveMod), gameState.globalSpeed + (0.01 * curveMod), gameState.globalBounce - (0.001 * curveMod))
+		gameState.newWave(gameState.numTickets + (2 * curveMod), gameState.globalSpeed + (0.1 * curveMod), gameState.globalBounce - (0.01 * curveMod))
 		currentState = gameState.dayState;
 	}
 
