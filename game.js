@@ -261,20 +261,29 @@ var p = {
 	"y": 24,
 	"wid": 32,
 	"hei": 32,
-	"sprites": {
-		"idle": 1,
-		"action": 3
-	},
-	"sprite": "idle",
 	"actionCountdown": 0
 }
+p.animations = {
+	"idle": new Animation([
+		new Frame(1, 2, 2, 1, 2)
+	]),
+	"action": new Animation([
+		new Frame(3, 2, 2, 1, 2)
+	]),
+	"punch": new Animation([
+		new Frame(38, 2, 2, 1, 2),
+		new Frame(40, 2, 2, 1, 2)
+	])
+}
+
+p.currentAnimation = "idle";
 
 p.update = function () {
 	if (btn(0) && this.y > 0) this.y--
 	if (btn(1) && this.y < shei - this.hei) this.y++
 	if (btn(2) && this.x > -(this.wid / 2)) this.x--
 	if (btn(3) && this.x < swid - this.wid / 2) this.x++
-	if (btnp(4)) {
+	if (btnp(4) && currentState == gameState) {
 		this.actionCountdown = 10;
 
 		for (var t = 0; t < tickets.length; t++) {
@@ -298,23 +307,33 @@ p.update = function () {
 			}
 		}
 	}
+
+	if (btnp(4) && currentState == gameoverState) {
+		if (collides({
+			'x': this.x,
+			'y': this.y,
+			'wid': this.wid / 2,
+			'hei': this.hei / 2 }, boss)) {
+			this.actionCountdown = 20;
+			this.currentAnimation = "punch";
+			boss.currentAnimation = "punched";
+		}
+	}
+
 	if (btnp(5)) {
 		// debug
 		currentState = gameoverState;
 	}
 	if (this.actionCountdown > 0) {
-		this.sprite = "action";
 		this.actionCountdown -= 1;
 	} else {
-		this.sprite = "idle";
+		this.currentAnimation = "idle";
 	}
 }
 
 p.draw = function () {
-	spr(this.sprites[this.sprite],
-		this.x,
-		this.y,
-		1, 2, 0, 0, 2, 2)
+	this.animations[this.currentAnimation].update(fc);
+	this.animations[this.currentAnimation].draw(this.x, this.y);
 }
 
 var bossAnimationFrames = [
@@ -339,6 +358,8 @@ boss.animations = {
 boss.currentAnimation = "idle";
 boss.x = swid - 32;
 boss.y = shei - 64;
+boss.wid = 32;
+boss.hei = 64;
 
 boss.draw = function() {
 	boss.animations[boss.currentAnimation].draw(swid - 32, shei - 64);
