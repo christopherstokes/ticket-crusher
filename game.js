@@ -85,66 +85,53 @@ EasingFunctions = {
 	}
 }
 
-// Player
-var p = {
-	"x": 96,
-	"y": 24,
-	"wid": 32,
-	"hei": 32,
-	"sprites": {
-		"idle": 1,
-		"action": 3
-	},
-	"sprite": "idle",
-	"actionCountdown": 0
+var Animation = function (frames, speed, startFrame) {
+	this.frames = frames || [];
+	this.speed = speed || 10;
+	this.currentFrame = startFrame || 0;
+	this.isFlipped = false;
 }
 
-p.update = function () {
-	if (btn(0) && this.y > 0) this.y--
-	if (btn(1) && this.y < shei - this.hei) this.y++
-	if (btn(2) && this.x > -(this.wid / 2)) this.x--
-	if (btn(3) && this.x < swid - this.wid / 2) this.x++
-	if (btnp(4)) {
-		this.actionCountdown = 10;
-
-		for (var t = 0; t < tickets.length; t++) {
-
-			if (collides({
-					'x': this.x,
-					'y': this.y,
-					'wid': this.wid / 2,
-					'hei': this.hei / 2
-				}, tickets[t]) && tickets[t].alive) {
-				for (var i = 0; i < 5; i++) {
-					var e = new Explosion(tickets[t].x + (tickets[t].wid / 2), tickets[t].y + (tickets[t].hei / 2));
-					explosions.push(e);
-				}
-
-				tickets[t].alive = false;
-				gameState.score += 1;
-				shaked = getRandomInt(3, 4);
-				shake = 5;
-				sfx(0, getRandomInt(45, 50));
-			}
+Animation.prototype.update = function (currentTime) {
+	if (currentTime % this.speed == 0) {
+		if (this.currentFrame < this.frames.length - 1) {
+			this.currentFrame++;
+		} else {
+			this.currentFrame = 0;
 		}
 	}
-	if (btnp(5)) {
-		// debug
-		currentState = gameoverState;
+}
+
+Animation.prototype.draw = function (x, y) {
+	var f = this.frames[this.currentFrame];
+
+	spr(f.id, x, y, f.ck, f.scl, f.flp, f.rot, f.wid, f.hei);
+}
+
+Animation.prototype.flip = function () {
+	for (var f = 0; f < this.frames.length; f++) {
+		if (this.isFlipped == false) {
+			this.frames[f].flp = 1;
+		} else {
+			this.frames[f].flp = 0;
+		}
 	}
-	if (this.actionCountdown > 0) {
-		this.sprite = "action";
-		this.actionCountdown -= 1;
+
+	if (this.isFlipped == true) {
+		this.isFlipped = false;
 	} else {
-		this.sprite = "idle";
+		this.isFlipped = true;
 	}
 }
 
-p.draw = function () {
-	spr(this.sprites[this.sprite],
-		this.x,
-		this.y,
-		1, 2, 0, 0, 2, 2)
+var Frame = function (id, wid, hei, ck, scl, flp, rot) {
+	this.id = id;
+	this.wid = wid || 1;
+	this.hei = hei || 1;
+	this.ck = ck || 0;
+	this.scl = scl || 1;
+	this.flp = flp || 0;
+	this.rot = rot || 0;
 }
 
 // tickets
@@ -268,54 +255,125 @@ Explosion.prototype.draw = function () {
 	circ(this.x, this.y, this.rad, 6);
 }
 
-var Animation = function (frames, speed, startFrame) {
-	this.frames = frames || [];
-	this.speed = speed || 10;
-	this.currentFrame = startFrame || 0;
-	this.isFlipped = false;
+// Player
+var p = {
+	"x": 96,
+	"y": 24,
+	"wid": 32,
+	"hei": 32,
+	"sprites": {
+		"idle": 1,
+		"action": 3
+	},
+	"sprite": "idle",
+	"actionCountdown": 0
 }
 
-Animation.prototype.update = function (currentTime) {
-	if (currentTime % this.speed == 0) {
-		if (this.currentFrame < this.frames.length - 1) {
-			this.currentFrame++;
-		} else {
-			this.currentFrame = 0;
+p.update = function () {
+	if (btn(0) && this.y > 0) this.y--
+	if (btn(1) && this.y < shei - this.hei) this.y++
+	if (btn(2) && this.x > -(this.wid / 2)) this.x--
+	if (btn(3) && this.x < swid - this.wid / 2) this.x++
+	if (btnp(4)) {
+		this.actionCountdown = 10;
+
+		for (var t = 0; t < tickets.length; t++) {
+
+			if (collides({
+					'x': this.x,
+					'y': this.y,
+					'wid': this.wid / 2,
+					'hei': this.hei / 2
+				}, tickets[t]) && tickets[t].alive) {
+				for (var i = 0; i < 5; i++) {
+					var e = new Explosion(tickets[t].x + (tickets[t].wid / 2), tickets[t].y + (tickets[t].hei / 2));
+					explosions.push(e);
+				}
+
+				tickets[t].alive = false;
+				gameState.score += 1;
+				shaked = getRandomInt(3, 4);
+				shake = 5;
+				sfx(0, getRandomInt(45, 50));
+			}
 		}
 	}
-}
-
-Animation.prototype.draw = function (x, y) {
-	var f = this.frames[this.currentFrame];
-
-	spr(f.id, x, y, f.ck, f.scl, f.flp, f.rot, f.wid, f.hei);
-}
-
-Animation.prototype.flip = function () {
-	for (var f = 0; f < this.frames.length; f++) {
-		if (this.isFlipped == false) {
-			this.frames[f].flp = 1;
-		} else {
-			this.frames[f].flp = 0;
-		}
+	if (btnp(5)) {
+		// debug
+		currentState = gameoverState;
 	}
-
-	if (this.isFlipped == true) {
-		this.isFlipped = false;
+	if (this.actionCountdown > 0) {
+		this.sprite = "action";
+		this.actionCountdown -= 1;
 	} else {
-		this.isFlipped = true;
+		this.sprite = "idle";
 	}
 }
 
-var Frame = function (id, wid, hei, ck, scl, flp, rot) {
-	this.id = id;
-	this.wid = wid || 1;
-	this.hei = hei || 1;
-	this.ck = ck || 0;
-	this.scl = scl || 1;
-	this.flp = flp || 0;
-	this.rot = rot || 0;
+p.draw = function () {
+	spr(this.sprites[this.sprite],
+		this.x,
+		this.y,
+		1, 2, 0, 0, 2, 2)
 }
+
+var bossAnimationFrames = [
+	new Frame(145, 2, 4, 0, 2),
+	new Frame(147, 2, 4, 0, 2),
+	new Frame(149, 2, 4, 0, 2),
+	new Frame(151, 2, 4, 0, 2)
+]
+var bossAnimation = new Animation(bossAnimationFrames);
+
+var bossAnimationPunchFrames = [
+	new Frame(153, 2, 4, 0, 2),
+	new Frame(155, 2, 4, 0, 2)
+]
+var bossAnimationPunch = new Animation(bossAnimationPunchFrames)
+
+var boss = {}
+boss.animations = {
+	"idle": bossAnimation,
+	"punched": bossAnimationPunch
+}
+boss.currentAnimation = "idle";
+boss.x = swid - 32;
+boss.y = shei - 64;
+
+boss.draw = function() {
+	boss.animations[boss.currentAnimation].draw(swid - 32, shei - 64);
+	boss.animations[boss.currentAnimation].update(fc);
+
+	if (boss.currentAnimation != "punched") {
+		var speechBubble = {
+			x: swid - 72,
+			y: shei - 39,
+			w: 35,
+			h: 16
+		}
+		rect(speechBubble.x, speechBubble.y, speechBubble.w, speechBubble.h, 15);
+		pix(speechBubble.x, speechBubble.y, 0);
+		pix(speechBubble.x, speechBubble.y + speechBubble.h - 1, 0);
+		pix(speechBubble.x + speechBubble.w - 1, speechBubble.y + speechBubble.h - 1, 0);
+
+		// triangle going from the two right corners of box and up towards mouth
+		tri(speechBubble.x + speechBubble.w, speechBubble.y,
+			speechBubble.x + speechBubble.w, speechBubble.y + (speechBubble.h / 2),
+			speechBubble.x + speechBubble.w + 8, speechBubble.y, 15);
+
+
+		if (fc % 60 > 15) {
+			print("YOU'RE", speechBubble.x + 2, speechBubble.y + 2, 0)
+		}
+		if (fc % 60 > 30) {
+			print("FIRED!", speechBubble.x + 2, speechBubble.y + 9, 0)
+		}
+	} else {
+		// particles?
+	}
+}
+
+
 
 var menuState = {}
 menuState.update = function () {
@@ -462,27 +520,6 @@ gameState.update = function () {
 
 }
 
-var bossAnimationFrames = [
-	new Frame(145, 2, 4, 0, 2),
-	new Frame(147, 2, 4, 0, 2),
-	new Frame(149, 2, 4, 0, 2),
-	new Frame(151, 2, 4, 0, 2)
-]
-var bossAnimation = new Animation(bossAnimationFrames);
-
-var bossAnimationPunchFrames = [
-	new Frame(153, 2, 4, 0, 2),
-	new Frame(155, 2, 4, 0, 2)
-]
-var bossAnimationPunch = new Animation(bossAnimationPunchFrames)
-
-var boss = {}
-boss.animations = {
-	"idle": bossAnimation,
-	"punched": bossAnimationPunch
-}
-boss.currentAnimation = "punched";
-
 var gameoverState = {};
 var fallingTickets = [];
 
@@ -520,45 +557,17 @@ gameoverState.update = function () {
 
 	map(60, 0, 30, 17, 0, 0, 0);
 
-	boss.animations[boss.currentAnimation].draw(swid - 32, shei - 64);
-	boss.animations[boss.currentAnimation].update(fc);
-
-	if (boss.currentAnimation != "punched") {
-		var speechBubble = {
-			x: swid - 72,
-			y: shei - 40,
-			w: 35,
-			h: 16
-		}
-		rect(speechBubble.x, speechBubble.y, speechBubble.w, speechBubble.h, 15);
-		pix(speechBubble.x, speechBubble.y, 0);
-		pix(speechBubble.x, speechBubble.y + speechBubble.h - 1, 0);
-		pix(speechBubble.x + speechBubble.w - 1, speechBubble.y + speechBubble.h - 1, 0);
-
-		// triangle going from the two right corners of box and up towards mouth
-		tri(speechBubble.x + speechBubble.w, speechBubble.y,
-			speechBubble.x + speechBubble.w, speechBubble.y + (speechBubble.h / 2),
-			speechBubble.x + speechBubble.w + 8, speechBubble.y, 15);
-
-
-		if (fc % 60 > 15) {
-			print("YOU'RE", speechBubble.x + 2, speechBubble.y + 2, 0)
-		}
-		if (fc % 60 > 30) {
-			print("FIRED!", speechBubble.x + 2, speechBubble.y + 9, 0)
-		}
-	} else {
-		// particles?
-	}
-
+	boss.draw();
 
 	var ticketClosed = "You managed to close " + gameState.score + " tickets!";
 	texWid = print(ticketClosed, 0, -32);
 	print(ticketClosed, (swid - texWid) / 2, (shei - 12) / 2);
 
-	var restart = "PRESS X TO RESTART";
-	texWid = print(restart, 0, -32);
-	print(restart, (swid - texWid) / 2, (shei + 24) / 2);
+	if (fc % 60 > 30) {
+		var restart = "PRESS X TO RESTART";
+		texWid = print(restart, 0, -32);
+		print(restart, (swid - texWid) / 2, (shei + 24) / 2);
+	}
 
 	p.update();
 	p.draw();
@@ -672,54 +681,54 @@ function scanline(row) {
 // 140:00000ff000000ff000000ff000000ff000000ff0ffffff00fffff00000000000
 // 141:000ff000000ff000000fff000000fff000000ff0000000ff0000000f00000000
 // 142:000ff000000ff00000fff0000fff00000ff00000ff000000f000000000000000
-// 145:000000000000003300000344000034440303444403333334003eccc300ee333c
-// 146:0000000033000000443000004443000044443030433333303ccce300c333ee00
-// 147:00000000000000000000003300000344000034440303444403333334003eccc3
-// 148:000000000000000033000000443000004443000044443030433333303ccce300
-// 149:000000000000003300000344000034440303444403333334003eccc300ee333c
-// 150:0000000033000000443000004443000044443030433333303ccce300c333ee00
-// 151:00000000000000000000003300000344000034440303444403333334003eccc3
-// 152:000000000000000033000000443000004443000044443030433333303ccce300
-// 153:000000000000003300000344000034440303444403333334003eccc300eecccc
-// 154:0000000033000000443000004443000044443030433333303ccce300ccccee00
-// 155:000000000000000000000033000003440000344403034444033333340030eee3
-// 156:000000000000000033000000443000004443000044443030433333303eee0300
-// 161:0eecc3cc003ccccc003cc3330003c3ff0003cc3300343ccc033443333f3443ff
-// 162:cc3ccee0ccccc300333cc300ff3c300033cc3000ccc3430033344330ff3443f3
-// 163:00ee333c0eecc3cc003ccccc003ccccc0003c3330033cc3303343ccc3f344333
-// 164:c333ee00cc3ccee0ccccc300ccccc300333c300033cc3300ccc34330333443f3
-// 165:0eecc3cc003ccccc003ccccc0003c3330003cccc00343ccc033443333f3443ff
-// 166:cc3ccee0ccccc300ccccc300333c3000cccc3000ccc3430033344330ff3443f3
-// 167:00ee333c0eecc3cc003ccccc003ccccc0003c3330003cc3300343ccc03344333
-// 168:c333ee00cc3ccee0ccccc300ccccc300333c300033cc3000ccc3430033344330
-// 169:00eecffc0eeccffc003ccccc003ccfff0003c3330003cc3303343ccf3f3443cc
-// 170:cffcee00cffccee0ccccc300fffcc300333c300033cc3000fcc34330cc3443f3
-// 171:0000eccc000ecccc00eecccc00eec3cc0eeccccc003ccccc0003ccc30003ccc3
-// 172:ccce0000cccce000ccccee00cc3cee00cccccee0ccccc3003ccc30003ccc3000
-// 177:3f3443ff3f3443ff033443ff0c3443ff0c3443ff0c3333330cc888830cc88883
-// 178:ff3443f3ff3443f3ff344330ff3443c0ff3443c0333333c088888cc088888cc0
-// 179:3f3443ff3f3443ff033443ff0c3443ff0c3443ff0c3333330cc888830cc88883
-// 180:ff3443f3ff3443f3ff344330ff3443c0ff3443c0333333c088888cc088888cc0
-// 181:3f3443ff3f3443ff033443ff0c3443ff0c3443ff0c3333330cc888830cc88883
-// 182:ff3443f3ff3443f3ff344330ff3443c0ff3443c0333333c088888cc088888cc0
-// 183:3f3443ff3f3443ff3f3443ff033443ff0c3443ff0c3443ff0c3333330cc88883
-// 184:ff3443f3ff3443f3ff3443f3ff344330ff3443c0ff3443c0333333c088888cc0
-// 185:3f3443333f3443ff033443ff0c3443ff0c3443ff0ccc333300cc888300388883
-// 186:333443f3ff3443f3ff344330ff3443c0ff3443c03333ccc08888cc0088888300
-// 187:33343ccc3f3443cc3f3443330f3443ff033443ff0c3443ff0cccc3ff003cc333
-// 188:ccc34330cc3443f3333443f3ff3443f3ff344330ff3443c0ff3cccc0333cc300
-// 193:0038888300388833003888300038883000344430034444300033333000000000
-// 194:8888830033888300038883000388830003444300034444300333330000000000
-// 195:0038888300388833003888300038883000344430034444300033333000000000
-// 196:8888830033888300038883000388830003444300034444300333330000000000
-// 197:0038888300388833003888300038883000344430034444300033333000000000
-// 198:8888830033888300038883000388830003444300034444300333330000000000
-// 199:0cc8888300388833003888300038883000344430034444300033333000000000
-// 200:88888cc033888300038883000388830003444300034444300333330000000000
-// 201:0038888300388833003888300003888300034443003444430003333300000000
-// 202:8888830033888300038883003888300034443000344443003333300000000000
-// 203:0038888300388833003888300003888300034443003444430003333300000000
-// 204:8888830033888300038883003888300034443000344443003333300000000000
+// 145:00000000000000000000003300000344000034440303444403333334003eccc3
+// 146:000000000000000033000000443000004443000044443030433333303ccce300
+// 147:0000000000000000000000000000003300000344000034440303444403333334
+// 148:0000000000000000000000003300000044300000444300004444303043333330
+// 149:00000000000000000000003300000344000034440303444403333334003eccc3
+// 150:000000000000000033000000443000004443000044443030433333303ccce300
+// 151:0000000000000000000000000000003300000344000034440303444403333334
+// 152:0000000000000000000000003300000044300000444300004444303043333330
+// 153:00000000000000000000003300000344000034440303444403333334003eccc3
+// 154:000000000000000033000000443000004443000044443030433333303ccce300
+// 155:0000000000000000000000000000003300000344000034440303444403333334
+// 156:0000000000000000000000003300000044300000444300004444303043333330
+// 161:00ee333c0eecc3cc003ccccc003cc3330003c3ff0003cc3300343ccc03344333
+// 162:c333ee00cc3ccee0ccccc300333cc300ff3c300033cc3000ccc3430033344330
+// 163:003eccc300ee333c0eecc3cc003ccccc003ccccc0003c3330033cc3303343ccc
+// 164:3ccce300c333ee00cc3ccee0ccccc300ccccc300333c300033cc3300ccc34330
+// 165:00ee333c0eecc3cc003ccccc003cc3330003c3ff0003cc3300343ccc03344333
+// 166:c333ee00cc3ccee0ccccc300333cc300ff3c300033cc3000ccc3430033344330
+// 167:003eccc300ee333c0eecc3cc003ccccc003ccccc0003c3330033cc3303343ccc
+// 168:3ccce300c333ee00cc3ccee0ccccc300ccccc300333c300033cc3300ccc34330
+// 169:00eecccc00eecffc0eeccffc003ccccc003ccfff0003c3330003cc3333343ccf
+// 170:ccccee00cffcee00cffccee0ccccc300fffcc300333c300033cc3000fcc34330
+// 171:0030eee30000eccc000ecccc00eecccc00eec3cc0eeccccc003ccccc0003ccc3
+// 172:3eee0300ccce0000cccce000ccccee00cc3cee00cccccee0ccccc3003ccc3000
+// 177:3f3443ff3f3443ff3f3443ff033443ff0c3443ff0c3443ff0c3333330cc88883
+// 178:ff3443f3ff3443f3ff3443f3ff344330ff3443c0ff3443c0333333c088888cc0
+// 179:3f3443333f3443ff3f3443ff033443ff0c3443ff0c3443ff0c3333330cc88883
+// 180:333443f3ff3443f3ff3443f3ff344330ff3443c0ff3443c0333333c088888cc0
+// 181:3f3443ff3f3443ff3f3443ff033443ff0c3443ff0c3443ff0c3333330cc88883
+// 182:ff3443f3ff3443f3ff3443f3ff344330ff3443c0ff3443c0333333c088888cc0
+// 183:3f3443333f3443ff3f3443ff033443ff0c3443ff0c3443ff0c3333330cc88883
+// 184:333443f3ff3443f3ff3443f3ff344330ff3443c0ff3443c0333333c088888cc0
+// 185:3f3443cc3f3443330f3443ff033443ff0c3443ff0c3443ff0ccc333300cc8883
+// 186:cc3443f3333443f3ff3443f3ff344330ff3443c0ff3443c03333ccc08888cc00
+// 187:0003ccc333343ccc3f3443cc3f3443330f3443ff033443ff0c3443ff0cccc3ff
+// 188:3ccc3000ccc34330cc3443f3333443f3ff3443f3ff344330ff3443c0ff3cccc0
+// 193:0cc8888300388883003888330038883000388830003444300344443000333330
+// 194:88888cc088888300338883000388830003888300034443000344443003333300
+// 195:0cc8888300388883003888330038883000388830003444300344443000333330
+// 196:88888cc088888300338883000388830003888300034443000344443003333300
+// 197:0cc8888300388883003888330038883000388830003444300344443000333330
+// 198:88888cc088888300338883000388830003888300034443000344443003333300
+// 199:0cc8888300388883003888330038883000388830003444300344443000333330
+// 200:88888cc088888300338883000388830003888300034443000344443003333300
+// 201:0038888300388883003888330038883000038883000344430034444300033333
+// 202:8888830088888300338883000388830038883000344430003444430033333000
+// 203:003cc33300388883003888330038883000038883000344430034444300033333
+// 204:333cc30088888300338883000388830038883000344430003444430033333000
 // </TILES>
 
 // <MAP>
