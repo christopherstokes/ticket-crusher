@@ -119,12 +119,12 @@ p.draw = function() {
 // tickets
 var tickets = []
 
-var Ticket = function(speed, bounce, x, y, dx, dy) {
+var Ticket = function(speed, bounce, x, y, dx, dy, w, h, spr) {
 	this.x = x || getRandomInt(16,swid-16);
 	this.y = y || getRandomInt(16,shei-24);
-	this.sprite = 5;
-	this.wid = 16;
-	this.hei = 16;
+	this.sprite = spr || 5;
+	this.wid = w || 16;
+	this.hei = h || 16;
 	this.alive = true;
 	this.speed = speed;
 	this.bounce = bounce;
@@ -151,6 +151,8 @@ var Ticket = function(speed, bounce, x, y, dx, dy) {
 	}	
 }
 
+var pentatonicScale = [0, 2, 3, 4, 6]
+
 Ticket.prototype.update = function() {
 	this.x += this.dx;
 	this.y += this.dy;
@@ -160,15 +162,15 @@ Ticket.prototype.update = function() {
 		this.bounce -=1;
 		shaked = getRandomInt(1,3);
 		shake = 2;
-		sfx(1, getRandomInt(45,50));
+		sfx(1, 3*12 + pentatonicScale[getRandomInt(0, pentatonicScale.length-1)]);
 	}
 	
-	if ((this.y < 16 || this.y > (shei-24)) && this.bounce >= 0) {
+	if ((this.y < 16 || this.y > (shei-this.wid-8)) && this.bounce >= 0) {
 		this.dy = this.dy * -1;
 		this.bounce -=1;
 		shaked = getRandomInt(1,3);
 		shake = 2;
-		sfx(1, getRandomInt(36,48));
+		sfx(1, 3*12 + pentatonicScale[getRandomInt(0, pentatonicScale.length-1)]);
 	}
 	
 	if ((this.x < -1 || this.x > swid+1 || this.y < 15 || this.y > shei-8) && this.bounce < 0) {
@@ -191,9 +193,9 @@ Ticket.prototype.update = function() {
 
 Ticket.prototype.draw = function() {
 	if (this.bounce < 1 && fc%30 < 15) {
-		rect(this.x-2, this.y-2, this.wid+4, this.hei+4, 6);
+		rect(this.x-2, this.y-2, this.wid+(this.wid/4), this.hei+(this.hei/4), 6);
 	} 
-	spr(this.sprite, this.x, this.y, -1, 1, 0, 0, 2, 2);
+	spr(this.sprite, this.x, this.y, -1, 1, 0, 0, this.wid/8, this.hei/8);
 }
 
 var explosions = [];
@@ -348,10 +350,10 @@ gameState.update = function() {
 			if ((getRandomInt(0, 10) > 8) && tickets[t].x > 32 && tickets[t].x < swid - 32 
 					&& tickets[t].y > 32 && tickets[t].y < shei-32) {
 				var subTickets =  [
-					new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x-tickets[t].wid, tickets[t].y-tickets[t].hei, -(gameState.globalSpeed), -1)
-					,new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x+tickets[t].wid, tickets[t].y+tickets[t].hei, gameState.globalSpeed, gameState.globalSpeed)
-					,new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x-tickets[t].wid, tickets[t].y+tickets[t].hei, -(gameState.globalSpeed), gameState.globalSpeed)
-					,new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x+tickets[t].wid, tickets[t].y-tickets[t].hei, gameState.globalSpeed, -(gameState.globalSpeed))
+					new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x-tickets[t].wid, tickets[t].y-tickets[t].hei, -(gameState.globalSpeed), -1, 8, 8, 53)
+					,new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x+tickets[t].wid, tickets[t].y+tickets[t].hei, gameState.globalSpeed, gameState.globalSpeed, 8, 8, 53)
+					,new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x-tickets[t].wid, tickets[t].y+tickets[t].hei, -(gameState.globalSpeed), gameState.globalSpeed, 8, 8, 53)
+					,new Ticket(gameState.globalSpeed, gameState.globalBounce, tickets[t].x+tickets[t].wid, tickets[t].y-tickets[t].hei, gameState.globalSpeed, -(gameState.globalSpeed), 8, 8, 53)
 				]
 				subTickets.forEach(function(t) {
 					tickets.push(t);
@@ -362,6 +364,7 @@ gameState.update = function() {
 								-(t.dx * 0.75), -(t.dy * 0.75)));
 					}
 				});
+				sfx(0, getRandomInt(5*12,5*12+12));
 			}
 			tickets.splice(t, 1);
 		} else {
@@ -549,6 +552,7 @@ function scanline(row) {
 // 050:7777777777777777777777777777777777777777777777777777777777777777
 // 051:3333333333333333333333333333333333333333333333333333333333333333
 // 052:1111111111111111111111111111111111111111111111111111111111111111
+// 053:ffffffffff0ff00fff0ffffff000f00ffffffffff000000ff666666fffffffff
 // 081:00000000000fffff00ffffff0ff0000f0ff0000f0ff0000f0ff0000f0000000f
 // 082:00000000fffff000ffffff00f0000ff0f0000ff0f0000ff0f0000ff0f0000000
 // 083:00000000000fffff00ffffff0ff0000f0ff0000f0000000f0000000f0000000f
