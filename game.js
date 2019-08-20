@@ -144,8 +144,8 @@ var Call = function(x, y, rings, call_length) {
 	this.hei = 32;
 	this.spr = 26;
 	this.rings = rings || 3;
-	this.call_length = 60 * call_length || 60;
-	this.call_length_max = 60 * call_length || 60;
+	this.call_length = call_length || 60;
+	this.call_length_max = call_length || 60;
 	this.alive = true;
 	this.active = false;
 }
@@ -541,6 +541,7 @@ gameState.newWave = function (num, speed, bounce) {
 	gameState.globalSpeed = speed;
 	gameState.globalBounce = bounce;
 	gameState.dayFrame = fc;
+	calls = [];
 
 	gameState.maxCalls += Math.floor(gameState.day/2);
 
@@ -573,8 +574,8 @@ gameState.update = function () {
 	map(0, 0, 30, 17, 0, -8, 0);
 	print("https://goodertrack.com", 4, 10, 0)
 
-	if (((getRandomInt(0, 100) - gameState.day) < 20 && calls.length <= gameState.maxCalls) && (fc%60 > 30)) {
-		calls.push(new Call());
+	if (((getRandomInt(0, 100) - gameState.day) < 5 && calls.length <= gameState.maxCalls) && (fc%60 > 30)) {
+		calls.push(new Call(false, false, false, getRandomInt(60, 60*gameState.day)));
 		sfx(5, 48);
 	}
 
