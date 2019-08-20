@@ -134,6 +134,67 @@ var Frame = function (id, wid, hei, ck, scl, flp, rot) {
 	this.rot = rot || 0;
 }
 
+// phones
+var calls = []
+
+var Call = function(x, y, rings, call_length) {
+	this.x = x || getRandomInt(16, swid - 32);
+	this.y = y || getRandomInt(16, shei - 40);
+	this.wid = 32;
+	this.hei = 32;
+	this.spr = 26;
+	this.rings = rings || 3;
+	this.call_length = 60 * call_length || 60;
+	this.call_length_max = 60 * call_length || 60;
+	this.alive = true;
+	this.active = false;
+}
+
+Call.prototype.update = function() {
+	if (this.rings <= 0) {
+		this.alive = false;
+		gameState.missed += 4;
+	}
+	if (this.rings > 0) {
+		if (fc % 120 == 0 && !this.active) {
+			sfx(5, 48);
+			this.rings -= 1
+		}
+	}
+	if (this.active) {
+		if (this.call_length < 0) {
+			this.alive = false;
+			gameState.score += 1;
+			for (var i = 0; i < 10; i++) {
+				var e = new Explosion(this.x + (this.wid / 2), this.y + (this.hei / 2));
+				explosions.push(e);
+				this.hit = true
+			}
+		} else {
+			this.call_length -= 1;
+		}
+	}
+}
+
+Call.prototype.draw = function() {
+	if (fc % 60 > 30) {
+		this.spr = 28
+	} else {
+		this.spr = 26
+	}
+
+	if (this.active) {
+		this.spr = 30
+	}
+
+	spr(this.spr, this.x, this.y, 0, 2, 0, 0, 2, 2);
+	
+	if (this.active) {
+		rect(this.x, this.y+(this.hei-4)/2, this.wid-1, 4, 0);
+		rect(this.x, this.y+(this.hei-4)/2, Math.floor((this.call_length/this.call_length_max)*this.wid) - 1, 4, 11);
+	}
+}
+
 // tickets
 var tickets = []
 
@@ -286,7 +347,21 @@ p.update = function () {
 	if (btn(3) && this.x < swid - this.wid / 2) this.x++
 	if (btnp(4) && currentState == gameState) {
 		this.actionCountdown = 10;
-		this.hit = false
+		this.hit = false;
+
+		for (var c=0; c < calls.length; c++) {
+			if (collides({
+					'x': this.x,
+					'y': this.y,
+					'wid': this.wid / 2,
+					'hei': this.hei / 2
+				}, calls[c]) && calls[c].alive && !this.hit) {
+				calls[c].active = true;
+				this.hit = true;
+				shaked = getRandomInt(4, 5);
+				shake = 5;
+			}
+		}
 
 		for (var t = 0; t < tickets.length; t++) {
 
@@ -295,7 +370,7 @@ p.update = function () {
 					'y': this.y,
 					'wid': this.wid / 2,
 					'hei': this.hei / 2
-				}, tickets[t]) && tickets[t].alive) {
+				}, tickets[t]) && tickets[t].alive && !this.hit) {
 				for (var i = 0; i < 5; i++) {
 					var e = new Explosion(tickets[t].x + (tickets[t].wid / 2), tickets[t].y + (tickets[t].hei / 2));
 					explosions.push(e);
@@ -447,6 +522,7 @@ gameState.score = 0;
 gameState.missed = 0;
 gameState.day = 1;
 gameState.dayFrame = 0;
+gameState.maxCalls = 0;
 gameState.globalSpeed;
 gameState.globalBounce;
 gameState.numTickets;
@@ -455,6 +531,7 @@ gameState.preload = function () {
 	gameState.missed = 0;
 	tickets = [];
 	explosions = [];
+	calls = [];
 	fc = 0;
 	gameState.newWave(5, 0.5, 5);
 	music(0);
@@ -464,6 +541,8 @@ gameState.newWave = function (num, speed, bounce) {
 	gameState.globalSpeed = speed;
 	gameState.globalBounce = bounce;
 	gameState.dayFrame = fc;
+
+	gameState.maxCalls += Math.floor(gameState.day/2);
 
 	for (var i = 0; i < gameState.numTickets; i++) {
 		var t = new Ticket(gameState.globalSpeed, gameState.globalBounce);
@@ -494,6 +573,11 @@ gameState.update = function () {
 	map(0, 0, 30, 17, 0, -8, 0);
 	print("https://goodertrack.com", 4, 10, 0)
 
+	if (((getRandomInt(0, 100) - gameState.day) < 20 && calls.length <= gameState.maxCalls) && (fc%60 > 30)) {
+		calls.push(new Call());
+		sfx(5, 48);
+	}
+
 	for (var t = tickets.length - 1; t > -1; t--) {
 		if (!tickets[t].alive) {
 			if ((getRandomInt(0, 10) > 8) && tickets[t].x > 32 && tickets[t].x < swid - 32 &&
@@ -519,6 +603,15 @@ gameState.update = function () {
 		}
 	}
 
+	for (var c = calls.length - 1; c > -1; c--) {
+		if (!calls[c].alive) {
+			calls.splice(c, 1);
+		} else {
+			calls[c].update();
+			calls[c].draw();
+		}
+	}
+	
 	for (e = explosions.length - 1; e > -1; e--) {
 		if (!explosions[e].alive) {
 			explosions.splice(e, 1);
@@ -548,7 +641,7 @@ gameState.update = function () {
 	if (tickets.length == 0) {
 		gameState.day += 1;
 		var curveMod = EasingFunctions.easeInCubic(((gameState.day % 5) + 1) / 5);
-		gameState.newWave(gameState.numTickets + (2 * curveMod), gameState.globalSpeed + (0.1 * curveMod), gameState.globalBounce - (0.01 * curveMod))
+		gameState.newWave(gameState.numTickets + (2 * curveMod), gameState.globalSpeed + (0.2 * curveMod), gameState.globalBounce - (0.02 * curveMod))
 		currentState = gameState.dayState;
 	}
 
@@ -660,10 +753,22 @@ function scanline(row) {
 // 023:0666666066f66ff66ff66f6666fff666666fff6666f66ff66ff66ff606666660
 // 024:0bbbbbb0bbfbbbbbbbfffbbbbbfffffbbbfffffbbbfffbbbbbfbbbbb0bbbbbb0
 // 025:0bbbbbb0bbbbbfbbbbbfffbbbfffffbbbfffffbbbbbfffbbbbbbbfbb0bbbbbb0
+// 026:0000000000000000000000000000000000033333003000000770030077770300
+// 027:0000000000000000000000000000000033330000000030000300770003077770
+// 028:000000000f000f0000f000000003333300300000077000007777030000000300
+// 029:000000000f000f000000f0003333000000003000000077000307777003000000
+// 030:0000000000000000000333330030000007700000777700000000030000000300
+// 031:0000000000000000333300000000300000007700000777700300000003000000
 // 038:11111111111111111111111111111100111110f0111110f0111000f01110f0ff
 // 039:11111111111111111111111100011111f0f01111f0f00111f0f0f011f0f0f011
 // 040:11111111111111101111110f1111110f1111100f111110ff111110ff111110ff
 // 041:11111111000011110f0f0011ffff0f01ffffff01ffffff01fffff011fffff011
+// 042:000033330007777700377f7f0037777700377f7f0037777700377f7f00377777
+// 043:33300000777700007f773000777730007f773000777730007f77300077773000
+// 044:000033330007777700377f7f0037777700377f7f0037777700377f7f00377777
+// 045:33300000777700007f773000777730007f773000777730007f77300077773000
+// 046:000033330007777700377f7f0037777700377f7f0037777700377f7f00377777
+// 047:33300000777700007f773000777730007f773000777730007f77300077773000
 // 049:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 // 050:7777777777777777777777777777777777777777777777777777777777777777
 // 051:3333333333333333333333333333333333333333333333333333333333333333
@@ -800,6 +905,7 @@ function scanline(row) {
 // 002:031003100300030f030e030e130e330e530e830e930f930fa300a301c300d300e300f300f300f300f300f300f300f300f300f300f300f300f300f300400000000000
 // 003:0062005200510040003f102f301e501e600d800d900cc00cd00cf00cf00df00df00df00ef00ef000f000f000f000f000f000f000f000f000f000f000100000000000
 // 004:140314021401140f140e240e540e840fa400b401b402b403d403d401e40ff40ef40ef40ff401f403f403f404f400f400f40ff40ef40ef40ef40ef40f200000000000
+// 005:0200020002000200f20002000200020002000200f200f200f200f200f200f200f200f200f200f200f200f200f200f200f200f200f200f200f200f200300000000000
 // </SFX>
 
 // <PATTERNS>
