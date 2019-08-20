@@ -532,7 +532,8 @@ gameState.maxCalls = 0;
 gameState.globalSpeed;
 gameState.globalBounce;
 gameState.numTickets;
-gameState.roundTime = 90*8;
+gameState.roundTimeMax = 90*8;
+gameState.roundTime = gameState.roundTimeMax;
 gameState.preload = function () {
 	gameState.score = 0;
 	gameState.missed = 0;
@@ -552,7 +553,7 @@ gameState.newWave = function (num, speed, bounce) {
 
 	gameState.maxCalls += Math.floor(gameState.day/2);
 	
-	gameState.roundTime = 90*8;
+	gameState.roundTime = gameState.roundTimeMax;
 
 	for (var i = 0; i < gameState.numTickets; i++) {
 		var t = new Ticket(gameState.globalSpeed, gameState.globalBounce);
@@ -651,11 +652,11 @@ gameState.update = function () {
 	// round time indicator
 	rect(70, shei-6, 99, 4, 15);
 	if (gameState.roundTime > 240) {
-		rect(70, shei-6, Math.round((gameState.roundTime/(90*8))*100) - 1, 4, 11);
+		rect(70, shei-6, Math.round((gameState.roundTime/(gameState.roundTimeMax))*100) - 1, 4, 11);
 	} else if (gameState.roundTime > 60) {
-		rect(70, shei-6, Math.round((gameState.roundTime/(90*8))*100) - 1, 4, 14);
+		rect(70, shei-6, Math.round((gameState.roundTime/(gameState.roundTimeMax))*100) - 1, 4, 14);
 	} else {
-		rect(70, shei-6, Math.round((gameState.roundTime/(90*8))*100) - 1, 4, 6);
+		rect(70, shei-6, Math.round((gameState.roundTime/(gameState.roundTimeMax))*100) - 1, 4, 6);
 	}
 
 	if (gameState.roundTime <= 0) {
