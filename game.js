@@ -427,6 +427,10 @@ menuState.update = function () {
 		texWid = print(subtitle3, 0, -32);
 		print(subtitle3, (swid - texWid) / 2, (shei + 52) / 2);	
 	}
+
+	var controls = "ARROW KEYS TO MOVE + CLICK WITH Z"
+	texWid = print(controls, 0, -32);
+	print(controls, (swid - texWid) / 2, (shei + 72) / 2)
 	
 	var bystatement = "--= A GAME BY XKFNGS =--"
 	texWid = print(bystatement, 0, -32);
