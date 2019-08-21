@@ -411,7 +411,7 @@ p.update = function () {
 			this.actionCountdown = 20;
 			this.currentAnimation = "punch";
 			boss.currentAnimation = "punched";
-
+			sfx(2, 72)
 			shake = 4
 			shaked = 4
 		} else {
