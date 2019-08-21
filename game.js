@@ -154,6 +154,11 @@ Call.prototype.update = function () {
 	if (this.rings <= 0) {
 		this.alive = false;
 		gameState.missed += 2;
+		for (var i = 0; i < 5; i++) {
+			var e = new Explosion(this.x + (this.wid / 2), this.y + (this.hei / 2));
+			explosions.push(e);
+			this.hit = true
+		}
 	}
 	if (this.rings > 0) {
 		if (fc % 90 == 0 && !this.active) {
@@ -560,9 +565,10 @@ gameState.newWave = function (num, speed, bounce) {
 	gameState.globalBounce = bounce;
 	gameState.dayFrame = fc;
 	calls = [];
+	tickets = [];
 
 	if (gameState.day > 5) {
-		gameState.maxCalls += min(gameState.day / 5);
+		gameState.maxCalls = Math.floor(gameState.day / 5);
 	}
 
 	gameState.roundTime = gameState.roundTimeMax;
@@ -620,6 +626,7 @@ gameState.update = function () {
 								-(t.dx * 0.75), -(t.dy * 0.75)));
 					}
 				});
+				subTickets = []
 				sfx(0, getRandomInt(5 * 12, 5 * 12 + 12));
 			}
 			tickets.splice(t, 1);
@@ -674,26 +681,30 @@ gameState.update = function () {
 		rect(70, shei - 6, Math.round((gameState.roundTime / (gameState.roundTimeMax)) * 100) - 1, 4, 6);
 	}
 
-	if (gameState.roundTime <= 0 || (calls.length == 0 && tickets.length == 0)) {
-		if (gameState.bonus > 0 && gameState.roundTime > 0) {
-			var bonusPoints = gameState.bonus + " BONUS POINTS!";
-			var texWid = print(bonusPoints, 0, -32);
-			var col = 15;
-			if (fc % 30 > 15) {
-				col = 14
+	// trace("tickets length: " + tickets.length + " | calls length: " + calls.length)
+
+	if (gameState.roundTime <= 0 || (calls.length <= 0 && tickets.length <= 0)) {
+		if (gameState.bonus > 0) {
+			if (gameState.roundTime > 0) {
+				var bonusPoints = gameState.bonus + " BONUS TICKETS!";
+				var texWid = print(bonusPoints, 0, -32);
+				var col = 15;
+				if (fc % 30 > 15) {
+					col = 14
+				}
+				print(bonusPoints, (swid - texWid)/2, shei - 16, col);
+				gameState.roundTime -= 4
+			} else {
+				gameState.score += gameState.bonus;
+				gameState.bonus = 0;
 			}
-			print(bonusPoints, (swid - texWid)/2, shei - 16, col);
-			
-			gameState.roundTime -= 4
 		} else {
 			if (gameState.roundTime > 0) {
 				gameState.bonus = Math.floor(gameState.roundTime / 90);
 			} else {
-				gameState.score += gameState.bonus;
-				gameState.bonus = 0;
 				gameState.day += 1;
-				var curveMod = Math.floor(gameState.day / 5)
-				gameState.newWave(gameState.numTickets + curveMod, gameState.globalSpeed + (0.2 * curveMod), gameState.globalBounce - (0.02 * curveMod))
+				var curveMod = Math.floor((gameState.day / 5)/2)
+				gameState.newWave(gameState.numTickets + curveMod, gameState.globalSpeed + (0.1 * curveMod), gameState.globalBounce - (0.01 * curveMod))
 				currentState = gameState.dayState;
 			}
 		}
