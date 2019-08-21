@@ -1,4 +1,4 @@
-		// title:  Ticket Crusher
+// title:  Ticket Crusher
 // author: Christopher Stokes
 // desc:   Completely accurate simulation of Technical Support
 // script: js
@@ -137,7 +137,7 @@ var Frame = function (id, wid, hei, ck, scl, flp, rot) {
 // phones
 var calls = []
 
-var Call = function(x, y, rings, call_length) {
+var Call = function (x, y, rings, call_length) {
 	this.x = x || getRandomInt(16, swid - 32);
 	this.y = y || getRandomInt(16, shei - 40);
 	this.wid = 32;
@@ -150,7 +150,7 @@ var Call = function(x, y, rings, call_length) {
 	this.active = false;
 }
 
-Call.prototype.update = function() {
+Call.prototype.update = function () {
 	if (this.rings <= 0) {
 		this.alive = false;
 		gameState.missed += 2;
@@ -176,7 +176,7 @@ Call.prototype.update = function() {
 	}
 }
 
-Call.prototype.draw = function() {
+Call.prototype.draw = function () {
 	if (fc % 60 > 30) {
 		this.spr = 28
 	} else {
@@ -188,10 +188,10 @@ Call.prototype.draw = function() {
 	}
 
 	spr(this.spr, this.x, this.y, 0, 2, 0, 0, 2, 2);
-	
+
 	if (this.active) {
-		rect(this.x, this.y+(this.hei-4)/2, this.wid-1, 4, 0);
-		rect(this.x, this.y+(this.hei-4)/2, Math.floor((this.call_length/this.call_length_max)*this.wid) - 1, 4, 11);
+		rect(this.x, this.y + (this.hei - 4) / 2, this.wid - 1, 4, 0);
+		rect(this.x, this.y + (this.hei - 4) / 2, Math.floor((this.call_length / this.call_length_max) * this.wid) - 1, 4, 11);
 	}
 }
 
@@ -349,7 +349,7 @@ p.update = function () {
 		this.actionCountdown = 10;
 		this.hit = false;
 
-		for (var c=0; c < calls.length; c++) {
+		for (var c = 0; c < calls.length; c++) {
 			if (collides({
 					'x': this.x,
 					'y': this.y,
@@ -386,6 +386,8 @@ p.update = function () {
 		}
 
 		if (!this.hit) {
+			this.actionCountdown = 10;
+			this.currentAnimation = "action";
 			sfx(0, 21)
 			shaked = 1
 			shake = 2
@@ -396,16 +398,23 @@ p.update = function () {
 
 	if (btnp(4) && currentState == gameoverState) {
 		if (collides({
-			'x': this.x,
-			'y': this.y,
-			'wid': this.wid / 2,
-			'hei': this.hei / 2 }, boss)) {
+				'x': this.x,
+				'y': this.y,
+				'wid': this.wid / 2,
+				'hei': this.hei / 2
+			}, boss)) {
 			this.actionCountdown = 20;
 			this.currentAnimation = "punch";
 			boss.currentAnimation = "punched";
 
-			shake=4
-			shaked=4
+			shake = 4
+			shaked = 4
+		} else {
+			this.actionCountdown = 10;
+			this.currentAnimation = "action";
+			sfx(0, 21)
+			shaked = 1
+			shake = 2
 		}
 	}
 
@@ -446,7 +455,7 @@ boss.y = shei - 64;
 boss.wid = 32;
 boss.hei = 64;
 
-boss.draw = function() {
+boss.draw = function () {
 	boss.animations[boss.currentAnimation].draw(swid - 32, shei - 64);
 	boss.animations[boss.currentAnimation].update(fc);
 
@@ -488,7 +497,7 @@ boss.draw = function() {
 }
 
 
-var wavelimit = 136/4;
+var wavelimit = 136 / 4;
 var menuState = {};
 menuState.update = function () {
 	cls(1);
@@ -504,16 +513,16 @@ menuState.update = function () {
 	if (fc % 60 > 30) {
 		var subtitle3 = "PRESS X TO START";
 		texWid = print(subtitle3, 0, -32);
-		print(subtitle3, (swid - texWid) / 2, (shei+6) / 2);	
+		print(subtitle3, (swid - texWid) / 2, (shei + 6) / 2);
 	}
 
 	var controls = "ARROW KEYS TO MOVE + CLICK WITH Z"
 	texWid = print(controls, 0, -32);
 	print(controls, (swid - texWid) / 2, (shei + 22) / 2)
-	
+
 	var bystatement = "--= A GAME BY XKFNGS =--"
 	texWid = print(bystatement, 0, -32);
-	print(bystatement, (swid - texWid) / 2, shei -12);
+	print(bystatement, (swid - texWid) / 2, shei - 12);
 
 	boss.draw();
 
@@ -532,7 +541,8 @@ gameState.maxCalls = 0;
 gameState.globalSpeed;
 gameState.globalBounce;
 gameState.numTickets;
-gameState.roundTimeMax = 90*8;
+gameState.roundTimeMax = 90 * 8;
+gameState.bonus = 0;
 gameState.roundTime = gameState.roundTimeMax;
 gameState.preload = function () {
 	gameState.score = 0;
@@ -551,8 +561,10 @@ gameState.newWave = function (num, speed, bounce) {
 	gameState.dayFrame = fc;
 	calls = [];
 
-	gameState.maxCalls += Math.floor(gameState.day/2);
-	
+	if (gameState.day > 5) {
+		gameState.maxCalls += min(gameState.day / 5);
+	}
+
 	gameState.roundTime = gameState.roundTimeMax;
 
 	for (var i = 0; i < gameState.numTickets; i++) {
@@ -584,10 +596,13 @@ gameState.update = function () {
 	map(0, 0, 30, 17, 0, -8, 0);
 	print("https://goodertrack.com", 4, 10, 0)
 
-	if (((getRandomInt(0, 100) - gameState.day) < 5 && calls.length <= gameState.maxCalls) && (fc%60 > 30)) {
-		calls.push(new Call(false, false, false, getRandomInt(60, 60*gameState.day)));
-		sfx(5, 48);
+	if (gameState.day > 5) {
+		if (((getRandomInt(0, 500) - gameState.day) < 5 && calls.length <= gameState.maxCalls) && (fc % 60 > 45)) {
+			calls.push(new Call(false, false, false, getRandomInt(60, 60 * gameState.day)));
+			sfx(5, 48);
+		}
 	}
+
 
 	for (var t = tickets.length - 1; t > -1; t--) {
 		if (!tickets[t].alive) {
@@ -622,7 +637,7 @@ gameState.update = function () {
 			calls[c].draw();
 		}
 	}
-	
+
 	for (e = explosions.length - 1; e > -1; e--) {
 		if (!explosions[e].alive) {
 			explosions.splice(e, 1);
@@ -650,20 +665,39 @@ gameState.update = function () {
 	print(TMtext, (swid - (texWid + 5)), shei - 7);
 
 	// round time indicator
-	rect(70, shei-6, 99, 4, 15);
+	rect(70, shei - 6, 99, 4, 15);
 	if (gameState.roundTime > 240) {
-		rect(70, shei-6, Math.round((gameState.roundTime/(gameState.roundTimeMax))*100) - 1, 4, 11);
+		rect(70, shei - 6, Math.round((gameState.roundTime / (gameState.roundTimeMax)) * 100) - 1, 4, 11);
 	} else if (gameState.roundTime > 60) {
-		rect(70, shei-6, Math.round((gameState.roundTime/(gameState.roundTimeMax))*100) - 1, 4, 14);
+		rect(70, shei - 6, Math.round((gameState.roundTime / (gameState.roundTimeMax)) * 100) - 1, 4, 14);
 	} else {
-		rect(70, shei-6, Math.round((gameState.roundTime/(gameState.roundTimeMax))*100) - 1, 4, 6);
+		rect(70, shei - 6, Math.round((gameState.roundTime / (gameState.roundTimeMax)) * 100) - 1, 4, 6);
 	}
 
-	if (gameState.roundTime <= 0) {
-		gameState.day += 1;
-		var curveMod = EasingFunctions.easeInCubic(((gameState.day % 5) + 1) / 5);
-		gameState.newWave(gameState.numTickets + (2 * curveMod), gameState.globalSpeed + (0.2 * curveMod), gameState.globalBounce - (0.02 * curveMod))
-		currentState = gameState.dayState;
+	if (gameState.roundTime <= 0 || (calls.length == 0 && tickets.length == 0)) {
+		if (gameState.bonus > 0 && gameState.roundTime > 0) {
+			var bonusPoints = gameState.bonus + " BONUS POINTS!";
+			var texWid = print(bonusPoints, 0, -32);
+			var col = 15;
+			if (fc % 30 > 15) {
+				col = 14
+			}
+			print(bonusPoints, (swid - texWid)/2, shei - 16, col);
+			
+			gameState.roundTime -= 4
+		} else {
+			if (gameState.roundTime > 0) {
+				gameState.bonus = Math.floor(gameState.roundTime / 90);
+			} else {
+				gameState.score += gameState.bonus;
+				gameState.bonus = 0;
+				gameState.day += 1;
+				var curveMod = Math.floor(gameState.day / 5)
+				gameState.newWave(gameState.numTickets + curveMod, gameState.globalSpeed + (0.2 * curveMod), gameState.globalBounce - (0.02 * curveMod))
+				currentState = gameState.dayState;
+			}
+		}
+
 	} else {
 		gameState.roundTime -= 1;
 	}
@@ -754,10 +788,10 @@ function scanline(row) {
 	if (shake > 0) poke(0x3FF9, getRandomInt(-(shaked), shaked))
 
 	if (currentState == menuState) {
-		if (row<wavelimit) {
-			poke(0x3ff9,Math.sin((time()/200+row/10))*7)
+		if (row < wavelimit) {
+			poke(0x3ff9, Math.sin((time() / 200 + row / 10)) * 7)
 		} else {
-			poke(0x3ff9,0)
+			poke(0x3ff9, 0)
 		}
 	}
 }
@@ -956,4 +990,3 @@ function scanline(row) {
 // <PALETTE>
 // 000:140c1c44243430346d4e4a4e854c30346524d04648757161597dced27d2c8595a16daa2cd2aa996dc2cadad45edeeed6
 // </PALETTE>
-
